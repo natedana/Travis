@@ -14,21 +14,10 @@ router.post('/interactive', (req, res, next) => {
         Term.create({
           term: parsed.actions[0].value,
         })
-        .then(resp => {
-          res.json({
-            text: `Your term ${resp.term} saved!🔥`
-          });
-        })
-        .catch(err => {
-          res.json({
-            text: 'Your term did not save 😔'
-          });
-        });
-      case ('')
+        .then(resp => res.json({ text: `Your term ${resp.term} saved!🔥` }))
+        .catch(err => res.json({ text: 'Your term did not save 😔' }) );
       default:
-        res.json({
-          text: 'Hmm, something went wrong with your interactive'
-        });
+        res.json({ text: 'Hmm, something went wrong with your interactive' });
     }
 })
 
