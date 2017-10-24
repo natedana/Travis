@@ -20,11 +20,8 @@
   "homepage": "https://github.com/tangsauce/Translator#readme",
   "dependencies": {
     "@slack/client": "^3.14.1",
-<<<<<<< HEAD
     "axios": "^0.17.0",
-=======
     "bluebird": "^3.5.1",
->>>>>>> 4631b15dbfa714ef74e8c5acda2127da2a15f582
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "mongoose": "^4.12.4",
