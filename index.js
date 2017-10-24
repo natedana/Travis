@@ -6,7 +6,6 @@ const bluebird = require('bluebird');
 const routes = require('./backend/routes');
 
 const app = express();
-app.use(bodyParser.json());
 
 mongoose.Promise = require('bluebird');
 mongoose.connect(process.env.MONGODB_URI, {
@@ -15,6 +14,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 mongoose.connection.on('error', console.log.bind(console, 'MongoDB failed to connect'));
 mongoose.connection.on('connected', console.log.bind(console, 'Connected to MongoDB'));
 
+app.use(bodyParser.json());
 app.use(routes);
 
 const port = 3000;

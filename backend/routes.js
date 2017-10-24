@@ -7,13 +7,9 @@ router.get('/', (req, res) => {
 });
 
 router.post('/new', (req, res) => {
-  const newTerm = new Term({
+  Term.create({
     term: req.body.term
   })
-  /* Term.create({ */
-  /*   term: req.body.term */
-  /* }) */
-  newTerm.save()
     .then(resp => {
       console.log('resp', resp);
       res.json({success: true, data: resp});
