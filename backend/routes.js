@@ -7,11 +7,12 @@ router.get('/', (req, res) => {
 });
 
 router.post('/new', (req, res) => {
+  console.log('reqbody', req.body.text, 'reqbod', req.body);
   Term.create({
-    term: req.body.term
+    term: req.body.text
   })
     .then(resp => {
-      console.log('resp', resp);
+      /* console.log('resp', resp); */
       res.json({success: true, data: resp});
     })
     .catch(err => {

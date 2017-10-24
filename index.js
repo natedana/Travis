@@ -11,6 +11,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 });
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(routes);
 
 const port = 3000;
