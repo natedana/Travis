@@ -6,13 +6,6 @@ router.get('/', (req, res) => {
   res.send('hello world');
 });
 
-// router.use('/interactive', (req, res, next) => {
-//   const callback_id = JSON.parse(req.payload).callback_id;
-//   if (callback_id === "CONFIRM_NEW_TERM") {
-//     next();
-//   }
-// })
-
 router.post('/interactive', (req, res, next) => {
     const parsed = JSON.parse(req.body.payload)
     const callback_id = parsed.callback_id;
