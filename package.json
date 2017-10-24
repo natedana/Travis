@@ -20,6 +20,7 @@
   "homepage": "https://github.com/tangsauce/Translator#readme",
   "dependencies": {
     "@slack/client": "^3.14.1",
+    "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "mongoose": "^4.12.4",
