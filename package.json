@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon index.js",
     "test": "mocha --timeout 5000 --exit",
-    "testSlack": "nodemon ./backend/slack.js"
+    "testSlack": "node ./backend/slack.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
   "homepage": "https://github.com/tangsauce/Translator#readme",
   "dependencies": {
     "@slack/client": "^3.14.1",
+    "axios": "^0.17.0",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "mongoose": "^4.12.4",
