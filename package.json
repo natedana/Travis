@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon index.js"
+    "test": "nodemon index.js",
+    "testSlack": "nodemon ./backend/slack.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
     "@slack/client": "^3.14.1",
     "express": "^4.16.2",
     "mongoose": "^4.12.4",
+    "node-schedule": "^1.2.5",
     "nodemon": "^1.12.1"
   },
   "devDependencies": {
