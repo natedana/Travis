@@ -16,35 +16,28 @@ router.get('/', (req, res) => {
 router.post('/interactive', (req, res, next) => {
     const parsed = JSON.parse(req.body.payload)
     const callback_id = parsed.callback_id;
-    if (callback_id === "CONFIRM_NEW_TERM") {
-      Term.create({
-        term: parsed.actions[0].value,
-      })
+    switch (callback_id) {
+      case ('CONFIRM_NEW_TERM'): // we need to check if name of button is save or reject TODO
+        Term.create({
+          term: parsed.actions[0].value,
+        })
         .then(resp => {
-          res.json({success: true, data: resp});
+          res.json({
+            text: `Your term ${resp.term} saved!🔥`
+          });
         })
         .catch(err => {
-          res.json({success: false, err, message: 'Error posting to /new'});
+          res.json({
+            text: 'Your term did not save 😔'
+          });
         });
-    } else {
-      res.json({success: false})
+      case ('')
+      default:
+        res.json({
+          text: 'Hmm, something went wrong with your interactive'
+        });
     }
 })
-
-// router.post('/new', (req, res) => {
-//   console.log('reqbody', req.body.text, 'reqbod', req.body);
-//   res.json({success: true})
-//   Term.create({
-//     term: req.body.text
-//   })
-//     .then(resp => {
-//       /* console.log('resp', resp); */
-//       res.json({success: true, data: resp});
-//     })
-//     .catch(err => {
-//       res.json({success: false, err, message: 'Error posting to /new'});
-//     });
-// })
 
 router.post('/new/confirm', (req, res) => {
   const confirmMsg = {
