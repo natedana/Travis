@@ -55,7 +55,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function handleRtmMessage(message) {
   axios({
     method: 'post',
     url: 'https://slack.com/api/chat.postMessage',
-    data: Object.assign(testMsg, {
+    body: Object.assign(testMsg, {
       token: bot_token
     }, {channel: channel})
   }).then(a=>{
