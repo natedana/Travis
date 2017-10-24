@@ -52,17 +52,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function handleRtmMessage(message) {
   console.log('User %s posted a message in %s channel', rtm.dataStore.getUserById(message.user).name, rtm.dataStore.getChannelGroupOrDMById(message.channel).name);
   rtm.sendMessage('test send', channel)
   // rtm.postMessage('test post', channel)
-  axios({
-    method: 'post',
-    url: 'https://slack.com/api/chat.postMessage',
-    body: Object.assign(testMsg, {
-      token: bot_token
-    }, {channel: channel})
-  }).then(a=>{
-    console.log("s",a);
-  }).catch(err=>{
-    console.log('err',err);
-  });
+  rtm.postMessage()
 });
 
 rtm.start();
