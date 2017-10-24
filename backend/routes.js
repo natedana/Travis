@@ -5,10 +5,6 @@ const Term = require('./models').Term;
 router.get('/', (req, res) => {
   res.send('hello world');
 });
-<<<<<<< HEAD
-router.post('/new', (req,res) => {
-  //add word
-=======
 
 router.post('/new', (req, res) => {
   Term.create({
@@ -21,7 +17,6 @@ router.post('/new', (req, res) => {
     .catch(err => {
       res.json({success: false, err, message: 'Error posting to /new'});
     });
->>>>>>> 1675edae7e891de4d8ae07121c966cee5a4f905a
 })
 router.post('/delete', (req,res) => {
   //delte word
