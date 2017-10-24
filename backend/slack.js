@@ -6,7 +6,7 @@ var bot_token = process.env.SLACK_BOT_TOKEN || '';
 
 var rtm = new RtmClient(bot_token);
 
-let channel;
+let channel = 'D7Q6BLS30';
 
 rtm.on(RTM_EVENTS.MESSAGE, function handleRtmMessage(message) {
   console.log(message);
@@ -15,6 +15,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function handleRtmMessage(message) {
     rtm.dataStore.getUserById(message.user).name,
     rtm.dataStore.getChannelGroupOrDMById(message.channel).name
   );
+  rtm.sendMessage('Hey there!',channel)
 });
 
 rtm.start();
