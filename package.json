@@ -1,0 +1,23 @@
+{
+  "name": "translator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tangsauce/Translator.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tangsauce/Translator/issues"
+  },
+  "homepage": "https://github.com/tangsauce/Translator#readme",
+  "dependencies": {
+    "@slack/client": "^3.14.1",
+    "express": "^4.16.2"
+  }
+}
