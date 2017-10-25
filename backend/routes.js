@@ -16,7 +16,10 @@ router.post('/interactive', (req, res, next) => {
       console.log(parsed.actions);
       if (parsed.actions[0].value[0] === '1') {
         Term.create({termEN: parsed.actions[0].value.split('_')[1].slice(3), termCN: parsed.actions[0].value.split('_')[2].slice(3)})
-          .then(resp => res.json({success: true, text: `Your term ${resp.term} saved!🔥`}))
+          .then(resp => {
+            console.log("word response",resp);
+            res.json({success: true, text: `Your term ${resp.term} saved!🔥`})
+          })
           .catch(err => res.json({success: false, text: 'Your term did not save 😔'}));
       } else {
         res.json({success: false, text: 'That\'s ok maybe next time.'})
