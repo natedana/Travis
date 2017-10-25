@@ -36,6 +36,8 @@ router.post('/interactive', (req, res, next) => {
 router.post('/new/confirm', (req, res) => {
   const languageOpts = ['en', 'zh-CN'];
   console.log(req.body.text);
+  console.log("BK",Object.keys(req.body));
+  console.log("B",req.body);
   axios.post('https://translation.googleapis.com/language/translate/v2?key=' + key, {
     q: [req.body.text],
     target: 'zh-CN',
