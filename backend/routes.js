@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Term = require('./models').Term;
 const axios = require('axios');
+const delaySeconds = require('./delay').delaySeconds;
 const key = process.env.GOOGLE_SERVER_KEY;
 router.get('/', (req, res) => {
   res.send('hello world');
@@ -14,7 +15,17 @@ router.post('/interactive', (req, res, next) => {
   switch (parsed.callback_id) {
     case('CONFIRM_NEW_TERM'): // we need to check if name of button is save or reject TODO
       console.log('confirm new term selected:');
-      console.log(parsed.actions);
+      delaySeconds(5000,() => {
+        console.log('5 second delay');
+
+        // axios.post(SLACK URL FOR MSG POST).send({
+        //   MSG text
+        // }).then((err,data)=>{
+        //   log("DELAY MSG", data)
+        // }).catch(err=>{
+        //   console.log("BAD DELAYED MSG",err);
+        // })
+      })
       if (parsed.actions[0].value[0] === '1') {
         Term.create({termEN: parsed.actions[0].value.split('_')[1].slice(3), termCN: parsed.actions[0].value.split('_')[2].slice(3)})
           .then(resp => {
@@ -77,28 +88,34 @@ router.post('/new/confirm', (req, res) => {
 });
 
 router.post('/delete', (req, res) => {
-  Term.remove({termEN:req.body.text}).exec( err => {
-    res.json({success:true, text:`Successfully deleted the term ${req.term}.`})
+  Term.remove({termEN: req.body.text}).exec((err, b) => {
+    res.json({success: true, text: `Successfully deleted the term ${req.body.text}.`})
   }).catch(err => {
-    res.json({success:false, text:`Something went wrong:`+err})
+    res.json({
+      success: false,
+      text: `Something went wrong:` + err
+    })
   })
 })
 
 router.post('/list', (req, res) => {
-  console.log("LIST called");
-  Term.find({}).exec( results => {
+  Term.find({}, (err, results) => {
     if (!results) {
-      res.json({success:false, text: "Empty list yoyoyo!"})
+      res.json({success: false, text: "Empty list yoyoyo!"})
     } else {
-      const text = 'Your terms:'
-      results.forEach(term=>{
+      let text = 'Your terms:'
+      results.forEach(term => {
         text += `\n   -${term.termEN} / ${term.termCN}`
       })
-      res.json({success:true, text,})
+      res.json({success: true, text})
     }
   }).catch(err => {
-    res.json({success:false, text:`Something went wrong:`+err})
+    res.json({
+      success: false,
+      text: `Something went wrong:` + err
+    })
   })
 })
+
 
 module.exports = router;
