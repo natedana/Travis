@@ -19,7 +19,7 @@ router.post('/interactive', (req, res, next) => {
         Term.create({termEN: parsed.actions[0].value.split('_')[1].slice(3), termCN: parsed.actions[0].value.split('_')[2].slice(3)})
           .then(resp => {
             console.log("word response",resp);
-            res.json({success: true, text: `Your term ${resp.termEN} saved!🔥`})
+            res.json({success: true, text: `Your term ${resp.termEN} -> ${resp.termCN} saved!🔥`})
           })
           .catch(err => res.json({success: false, text: 'Your term did not save 😔'}));
       } else {
@@ -72,13 +72,28 @@ router.post('/new/confirm', (req, res) => {
     }
     res.status(200).json(confirmMsg);
   }).catch(err => {
-    console.log("ERR", err.response.status);
-    console.log("ERR", err.response.data);
     console.log("ERR", err.response.data.error.errors);
   })
 });
 
 router.post('/delete', (req, res) => {
-  Term.remove({termEN:req.term})
+  Term.remove({termEN:req.term}).exec( err => {
+    res.json({success:true, text:`Successfully deleted the term ${req.term}.`})
+  }).catch(err => {
+    res.json({success:false, text:`Something went wrong:`+err})
+  })
 })
+
+router.post('/list', (req, res) => {
+  Term.find().exec(results=>{
+    const text = 'Your terms:'
+    results.forEach(term=>{
+      text += `\n   -${term.termEN} / ${term.termCN}`
+    })
+    res.json({success:true, text,})
+  }).catch(err => {
+    res.json({success:false, text:`Something went wrong:`+err})
+  })
+})
+
 module.exports = router;
