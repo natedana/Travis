@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const Term = require('./models').Term;
 const axios = require('axios');
+
+const Term = require('./models').Term;
 const key = process.env.GOOGLE_SERVER_KEY;
+
 router.get('/', (req, res) => {
   res.send('hello world');
 });
