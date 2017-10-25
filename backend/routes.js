@@ -1,9 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const Term = require('./models').Term;
 const axios = require('axios');
+<<<<<<< HEAD
 const delaySeconds = require('./delay').delaySeconds;
+=======
+
+const Term = require('./models').Term;
+>>>>>>> master
 const key = process.env.GOOGLE_SERVER_KEY;
+
 router.get('/', (req, res) => {
   res.send('hello world');
 });
@@ -87,6 +92,7 @@ router.post('/new/confirm', (req, res) => {
   })
 });
 
+<<<<<<< HEAD
 router.post('/delete', (req, res) => {
   Term.remove({termEN: req.body.text}).exec((err, b) => {
     res.json({success: true, text: `Successfully deleted the term ${req.body.text}.`})
@@ -115,6 +121,12 @@ router.post('/list', (req, res) => {
       text: `Something went wrong:` + err
     })
   })
+=======
+router.post('/slack/events', (req, res) => {
+  const challenge = req.body.challenge;
+  console.log('challenge', challenge);
+  res.json({ challenge })
+>>>>>>> master
 })
 
 
