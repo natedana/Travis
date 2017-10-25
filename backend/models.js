@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 
 const TermSchema = new mongoose.Schema({
-  term: {
+  termEN: {
+    type: String,
+  },
+  termCN: {
     type: String,
   },
   timeStamp: {
