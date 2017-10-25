@@ -12,9 +12,9 @@ router.post('/interactive', (req, res, next) => {
   const callback_id = parsed.callback_id;
   switch (callback_id) {
     case('CONFIRM_NEW_TERM'): // we need to check if name of button is save or reject TODO
-      Term.create({termEN: parsed.actions[0].value.en, termCN: parsed.actions[0].value.cn}).then(resp => res.json({text: `Your term ${resp.term} saved!🔥`})).catch(err => res.json({text: 'Your term did not save 😔'}));
+      Term.create({termEN: parsed.actions[0].value.en, termCN: parsed.actions[0].value.cn}).then(resp => res.json({success: true, text: `Your term ${resp.term} saved!🔥`})).catch(err => res.json({success: false, text: 'Your term did not save 😔'}));
     default:
-      res.json({text: 'Hmm, something went wrong with your interactive'});
+      res.json({success: false, text: 'Hmm, something went wrong with your interactive'});
   }
 })
 
@@ -55,7 +55,7 @@ router.post('/new/confirm', (req, res) => {
         }
       ]
     }
-    res.json(confirmMsg);
+    res.status(200).json(confirmMsg);
   }).catch(err => {
     console.log("ERR", err.response.status);
     console.log("ERR", err.response.data);
