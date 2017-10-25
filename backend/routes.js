@@ -14,7 +14,13 @@ router.post('/interactive', (req, res, next) => {
     case('CONFIRM_NEW_TERM'): // we need to check if name of button is save or reject TODO
       console.log('confirm new term selected:');
       console.log(parsed.actions);
-      Term.create({termEN: parsed.actions[0].value.en, termCN: parsed.actions[0].value.cn}).then(resp => res.json({success: true, text: `Your term ${resp.term} saved!🔥`})).catch(err => res.json({success: false, text: 'Your term did not save 😔'}));
+      if (parsed.actions[0].value[0] === '1') {
+        Term.create({termEN: parsed.actions[0].value.split('_')[1].slice(3), termCN: parsed.actions[0].value.split('_')[2].slice(3)})
+          .then(resp => res.json({success: true, text: `Your term ${resp.term} saved!🔥`}))
+          .catch(err => res.json({success: false, text: 'Your term did not save 😔'}));
+      } else {
+        res.json({success: false, text: 'That\'s ok maybe next time.'})
+      }
       break;
     default:
       console.log('default passed \n \n Parsed payload');
@@ -46,15 +52,12 @@ router.post('/new/confirm', (req, res) => {
               "name": "save",
               "text": "Save",
               "type": "button",
-              "value": {
-                en: `${req.body.text}`,
-                cn: termTranslated[0].translatedText
-              },
+              "value": "1_EN="+req.body.text"_CN="+termTranslated[0].translatedText
             }, {
               "name": "reject",
               "text": "Reject",
               "type": "button",
-              "value": "reject"
+              "value": "0"
             }
           ]
         }
