@@ -86,7 +86,7 @@ router.post('/delete', (req, res) => {
 
 router.post('/list', (req, res) => {
   console.log("LIST called");
-  Term.find().exec( results => {
+  Term.find({}).exec( results => {
     if (!results) {
       res.json({success:false, text: "Empty list yoyoyo!"})
     } else {
