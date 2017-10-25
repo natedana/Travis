@@ -77,7 +77,7 @@ router.post('/new/confirm', (req, res) => {
 });
 
 router.post('/delete', (req, res) => {
-  Term.remove({termEN:req.term}).exec( err => {
+  Term.remove({termEN:req.body.text}).exec( err => {
     res.json({success:true, text:`Successfully deleted the term ${req.term}.`})
   }).catch(err => {
     res.json({success:false, text:`Something went wrong:`+err})
@@ -85,6 +85,7 @@ router.post('/delete', (req, res) => {
 })
 
 router.post('/list', (req, res) => {
+  console.log("LIST called");
   Term.find().exec(results=>{
     const text = 'Your terms:'
     results.forEach(term=>{
