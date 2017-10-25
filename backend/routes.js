@@ -87,11 +87,15 @@ router.post('/delete', (req, res) => {
 router.post('/list', (req, res) => {
   console.log("LIST called");
   Term.find().exec(results=>{
-    const text = 'Your terms:'
-    results.forEach(term=>{
-      text += `\n   -${term.termEN} / ${term.termCN}`
-    })
-    res.json({success:true, text,})
+    if (results.length === 0) {
+      res.json({success:false, text: "Empty list yoyoyo!"})
+    } else {
+      const text = 'Your terms:'
+      results.forEach(term=>{
+        text += `\n   -${term.termEN} / ${term.termCN}`
+      })
+      res.json({success:true, text,})
+    }
   }).catch(err => {
     res.json({success:false, text:`Something went wrong:`+err})
   })
