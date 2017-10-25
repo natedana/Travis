@@ -119,10 +119,9 @@ router.post('/list', (req, res) => {
   })
 });
 
-router.post('/slack/events', (req, res) => {
-  const challenge = req.body.challenge;
-  console.log('challenge', challenge);
-  res.json({ challenge })
+router.post('/slack/fulfillment', (req, res) => {
+  console.log('/slack/fulfillment', req.body);
+  res.send('hi!');
 })
 
 
