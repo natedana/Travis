@@ -69,7 +69,9 @@ router.post('/new/confirm', (req, res) => {
   })
 });
 
-router.post('/delete', (req, res) => {
-  //delte word
+router.post('/slack/events', (req, res) => {
+  const challenge = req.body.challenge;
+  console.log('challenge', challenge);
+  res.json({ challenge })
 })
 module.exports = router;
