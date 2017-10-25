@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
 
 const routes = require('./backend/routes');
 
