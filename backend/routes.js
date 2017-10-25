@@ -9,10 +9,14 @@ router.get('/', (req, res) => {
 
 router.post('/interactive', (req, res, next) => {
   const parsed = JSON.parse(req.body.payload); //tests vs. real might have diff data structure
+  console.log('parsed payload', parsed);
   switch (parsed.callback_id) {
     case('CONFIRM_NEW_TERM'): // we need to check if name of button is save or reject TODO
+      console.log('confrim new term selected:');
       Term.create({termEN: parsed.actions[0].value.en, termCN: parsed.actions[0].value.cn}).then(resp => res.json({success: true, text: `Your term ${resp.term} saved!🔥`})).catch(err => res.json({success: false, text: 'Your term did not save 😔'}));
+      break;
     default:
+      console.log('default passed \n \n Parsed payload');
       console.log(parsed);
       res.json({success: false, text: 'Hmm, something went wrong with your interactive'});
   }
