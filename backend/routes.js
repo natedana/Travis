@@ -8,12 +8,12 @@ router.get('/', (req, res) => {
 });
 
 router.post('/interactive', (req, res, next) => {
-  const parsed = JSON.parse(req.body.payload);
-  const callback_id = parsed.callback_id;
-  switch (callback_id) {
+  const parsed = JSON.parse(req.body.payload); //tests vs. real might have diff data structure
+  switch (parsed.callback_id) {
     case('CONFIRM_NEW_TERM'): // we need to check if name of button is save or reject TODO
       Term.create({termEN: parsed.actions[0].value.en, termCN: parsed.actions[0].value.cn}).then(resp => res.json({success: true, text: `Your term ${resp.term} saved!🔥`})).catch(err => res.json({success: false, text: 'Your term did not save 😔'}));
     default:
+      console.log(parsed);
       res.json({success: false, text: 'Hmm, something went wrong with your interactive'});
   }
 })
