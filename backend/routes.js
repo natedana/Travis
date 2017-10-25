@@ -12,7 +12,8 @@ router.post('/interactive', (req, res, next) => {
   console.log('parsed payload', parsed);
   switch (parsed.callback_id) {
     case('CONFIRM_NEW_TERM'): // we need to check if name of button is save or reject TODO
-      console.log('confrim new term selected:');
+      console.log('confirm new term selected:');
+      console.log(parsed.actions);
       Term.create({termEN: parsed.actions[0].value.en, termCN: parsed.actions[0].value.cn}).then(resp => res.json({success: true, text: `Your term ${resp.term} saved!🔥`})).catch(err => res.json({success: false, text: 'Your term did not save 😔'}));
       break;
     default:
