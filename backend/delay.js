@@ -14,7 +14,8 @@ const parser = require('cron-parser');
 // })
 
 const secondsTimer = function(period, cb) {
-  const timeSec = new Date().getSeconds() + period;
+  const seconds = new Date().getSeconds() + period
+  const timeSec = seconds > 60 ? seconds - 60 : seconds;
   const startTime = new Date(Date.now());
   const endTime = new Date(startTime.getTime() + period * 1000);
   const rule = `${timeSec} * * * * *`;
@@ -23,7 +24,8 @@ const secondsTimer = function(period, cb) {
   })
 }
 const minutesTimer = function(period, cb) {
-  const timeMins = new Date().getMinutes() + period;
+  const minutes = new Date().getMinutes() + period
+  const timeMins = minutes > 60 ? minutes - 60 : minutes;
   const startTime = new Date(Date.now());
   const endTime = new Date(startTime.getTime() + period * 1000 * 60);
   const rule = `* ${timeMins} * * * *`;
@@ -32,7 +34,8 @@ const minutesTimer = function(period, cb) {
   })
 }
 const hoursTimer = function(period, cb) {
-  const timeHrs = new Date().getHours() + period;
+  const hours = new Date().getSeconds() + period
+  const timeHrs = hours > 12 ? hours - 12 : hours;
   const startTime = new Date(Date.now());
   const endTime = new Date(startTime.getTime() + period * 1000 * 60 * 60);
   const rule = `* * ${timeHrs} * * *`;
@@ -40,6 +43,7 @@ const hoursTimer = function(period, cb) {
     cb()
   })
 }
+
 
 module.exports = {
   delaySeconds: secondsTimer,
