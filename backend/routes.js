@@ -52,7 +52,7 @@ router.post('/new/confirm', (req, res) => {
               "name": "save",
               "text": "Save",
               "type": "button",
-              "value": "1_EN="+req.body.text"_CN="+termTranslated[0].translatedText
+              "value": "1_EN="+req.body.text+"_CN="+termTranslated[0].translatedText
             }, {
               "name": "reject",
               "text": "Reject",
