@@ -66,6 +66,8 @@ router.post('/new/confirm', (req, res) => {
 });
 
 router.post('/slack/events', (req, res) => {
-  console.log(req);
+  const challenge = req.body.challenge;
+  console.log('challenge', challenge);
+  res.json({ challenge })
 })
 module.exports = router;
