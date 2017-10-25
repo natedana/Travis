@@ -65,7 +65,7 @@ router.post('/new/confirm', (req, res) => {
   })
 });
 
-router.post('/delete', (req, res) => {
-  //delte word
+router.post('/slack/events', (req, res) => {
+  console.log(req);
 })
 module.exports = router;
