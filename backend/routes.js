@@ -8,6 +8,7 @@ router.get('/', (req, res) => {
 });
 
 router.post('/interactive', (req, res, next) => {
+  console.log("PAYLOAD\n\n\n",req.body.payload);
   const parsed = JSON.parse(req.body.payload); //tests vs. real might have diff data structure
   console.log('parsed payload', parsed);
   switch (parsed.callback_id) {
@@ -22,7 +23,7 @@ router.post('/interactive', (req, res, next) => {
           })
           .catch(err => res.json({success: false, text: 'Your term did not save 😔'}));
       } else {
-        res.json({success: false, text: 'That\'s ok maybe next time.'})
+        res.json({success: true, text: 'That\'s ok maybe next time.'})
       }
       break;
     default:
@@ -34,8 +35,9 @@ router.post('/interactive', (req, res, next) => {
 
 router.post('/new/confirm', (req, res) => {
   const languageOpts = ['en', 'zh-CN'];
+  console.log(req);
   axios.post('https://translation.googleapis.com/language/translate/v2?key=' + key, {
-    q: ['truck'],
+    q: [req.text],
     target: 'zh-CN',
     format: 'text',
     source: 'en'
@@ -75,6 +77,6 @@ router.post('/new/confirm', (req, res) => {
 });
 
 router.post('/delete', (req, res) => {
-  //delte word
+  Term.remove({termEN:req.term})
 })
 module.exports = router;
