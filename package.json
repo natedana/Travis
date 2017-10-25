@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "node index.js",
     "test": "mocha --timeout 5000 --exit",
     "testSlack": "node ./backend/slack.js",
-    "fullStart": "node ./backend/slack.js && nodemon index.js"
+    "fullStart": "node ./backend/slack.js && nodemon index.js",
+    "runServer": "nodemon index.js"
   },
   "repository": {
     "type": "git",
