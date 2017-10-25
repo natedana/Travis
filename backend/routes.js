@@ -17,12 +17,14 @@ router.post('/slack/fulfillment', (req, res, next) => {
     case 'save-term-followup.confirm':
       Term.create({ termEN: result.parameters.term })
         .then(resp => {
-          console.log("term created",resp);
+          console.log("term created", resp);
+          res.send('term created');
         })
         .catch(err => console.log('Error: term not created', err));
       break;
     default:
       console.log('default passed');
+      res.send('default passed');
   }
 })
 
