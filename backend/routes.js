@@ -10,6 +10,22 @@ router.get('/', (req, res) => {
   res.send('hello world');
 });
 
+router.post('/slack/fulfillment', (req, res, next) => {
+  console.log('/slack/fulfillment', req.body);
+  const result = req.body.result;
+  switch (result.action) {
+    case 'save-term-followup.confirm':
+      Term.create({ termEN: result.parameters.term })
+        .then(resp => {
+          console.log("term created",resp);
+        })
+        .catch(err => console.log('Error: term not created', err));
+      break;
+    default:
+      console.log('default passed');
+  }
+})
+
 router.post('/interactive', (req, res, next) => {
   console.log("PAYLOAD\n\n\n",req.body.payload);
   const parsed = JSON.parse(req.body.payload); //tests vs. real might have diff data structure
@@ -19,14 +35,6 @@ router.post('/interactive', (req, res, next) => {
       console.log('confirm new term selected:');
       delaySeconds(5000,() => {
         console.log('5 second delay');
-
-        // axios.post(SLACK URL FOR MSG POST).send({
-        //   MSG text
-        // }).then((err,data)=>{
-        //   log("DELAY MSG", data)
-        // }).catch(err=>{
-        //   console.log("BAD DELAYED MSG",err);
-        // })
       })
       if (parsed.actions[0].value[0] === '1') {
         Term.create({termEN: parsed.actions[0].value.split('_')[1].slice(3), termCN: parsed.actions[0].value.split('_')[2].slice(3)})
@@ -45,49 +53,6 @@ router.post('/interactive', (req, res, next) => {
       res.json({success: false, text: 'Hmm, something went wrong with your interactive'});
   }
 })
-
-router.post('/new/confirm', (req, res) => {
-  const languageOpts = ['en', 'zh-CN'];
-  console.log(req.body.text);
-  console.log("BK",Object.keys(req.body));
-  console.log("B",req.body);
-  axios.post('https://translation.googleapis.com/language/translate/v2?key=' + key, {
-    q: [req.body.text],
-    target: 'zh-CN',
-    format: 'text',
-    source: 'en'
-  }).then(result => {
-    const termTranslated = result.data.data.translations;
-    const confirmMsg = {
-      "text": `Would you like to save the word ${req.body.text}?`,
-      "attachments": [
-        {
-          "text": "Save or reject",
-          "fallback": "You are unable to confirm this word.",
-          "callback_id": "CONFIRM_NEW_TERM",
-          "color": "#3AA3E3",
-          "attachment_type": "default",
-          "actions": [
-            {
-              "name": "save",
-              "text": "Save",
-              "type": "button",
-              "value": "1_EN="+req.body.text+"_CN="+termTranslated[0].translatedText
-            }, {
-              "name": "reject",
-              "text": "Reject",
-              "type": "button",
-              "value": "0"
-            }
-          ]
-        }
-      ]
-    }
-    res.status(200).json(confirmMsg);
-  }).catch(err => {
-    console.log("ERR", err.response.data.error.errors);
-  })
-});
 
 router.post('/delete', (req, res) => {
   Term.remove({termEN: req.body.text}).exec((err, b) => {
@@ -118,11 +83,6 @@ router.post('/list', (req, res) => {
     })
   })
 });
-
-router.post('/slack/fulfillment', (req, res) => {
-  console.log('/slack/fulfillment', req.body);
-  res.send('hi!');
-})
 
 
 module.exports = router;
