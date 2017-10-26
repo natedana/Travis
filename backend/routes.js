@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const delaySeconds = require('./delay').delaySeconds;
+const fs = require('fs');
 
 const Term = require('./models').Term;
 const key = process.env.GOOGLE_SERVER_KEY;
@@ -86,5 +87,11 @@ router.post('/list', (req, res) => {
   })
 });
 
+router.get('/privacy_policy', (req, res) => {
+  fs.readFile('./privacy_policy.html', 'utf8', (err, data) => {
+    console.log(data);
+    res.send(data);
+  });
+})
 
 module.exports = router;
