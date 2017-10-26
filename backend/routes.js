@@ -5,9 +5,19 @@ const delaySeconds = require('./delay').delaySeconds;
 const fs = require('fs');
 
 const Term = require('./models').Term;
-const key = process.env.GOOGLE_SERVER_KEY;
 
 const newRes = require('./responseGenerator');
+
+// when we do `res.json({ speech, displayText })`, we are using "Fulfillment Response" (https://dialogflow.com/docs/fulfillment#response)
+
+// however, we can also send very simple DialogFlow "default messages" using the formats at this URL:   https://dialogflow.com/docs/reference/agent/message-objects#one-click_integration_message_objects
+//  res.send({"messages": [
+//    {
+//      "speech": "Text response",
+//      "type": 0
+//    }
+//  ]});
+
 
 router.get('/', (req, res) => {
   res.send('hello world');
@@ -40,18 +50,10 @@ router.post('/fulfillment', (req, res, next) => {
           res.json({ speech: displayText, displayText });
         } else {
           displayText = 'Your terms:';
-          results.forEach(term => {
-            displayText += `\n - ${term.termEN}`;
+          results.forEach((term, idx) => {
+            displayText += `\n ${idx + 1}) ${term.termEN}`;
           });
-          //  using DialogFlow "Fulfillment Response" (https://dialogflow.com/docs/fulfillment#response)
           res.json({ speech: displayText, displayText });
-          // using DialogFlow "default messages" (https://dialogflow.com/docs/reference/agent/message-objects#one-click_integration_message_objects)
-          //  res.send({"messages": [
-          //    {
-          //      "speech": "Text response",
-          //      "type": 0
-          //    }
-          //  ]});
         }
       }).catch(err => {
         displayText = `Error: ${err}`;
@@ -59,18 +61,43 @@ router.post('/fulfillment', (req, res, next) => {
       });
       break;
     case 'translate':
-      axios.post('https://translation.googleapis.com/language/translate/v2?key=' + key, {
+      axios.post('https://translation.googleapis.com/language/translate/v2?key=' + process.env.GOOGLE_SEVER_KEY, {
         q: result.parameters.term,
         target: 'zh-CN',
         source: 'en',
         format: 'text'
       }).then((resp) => {
-        displayText = `${result.parameters.term} translated: ${resp.data.data.translations[0].translatedText}`;
+        displayText = `${result.parameters.term} ~ ${resp.data.data.translations[0].translatedText}`;
         res.json({ speech: displayText, displayText });
       }).catch(err => {
         displayText = 'Error: ' + err;
         res.json({ speech: displayText, displayText });
       });
+      break;
+    case 'picture':
+      var q = 'q='+result.parameters.term;
+      var safe = 'safe=medium';
+      var searchType = 'searchType=image';
+      var num = 'num=1';
+      var key = `key=${process.env.GOOGLE_SERVER_KEY}`;
+      var cx = `cx=${process.env.SEARCH_ID}`;
+      var params = [q, safe, searchType, num, key, cx];
+      var url = 'https://www.googleapis.com/customsearch/v1?' + params.join('&');
+      axios.get(url).then((res) => {
+        const IMtitle = res.data.items[0].title;
+        const IMurl = res.data.items[0].image.thumbnailLink;
+        console.log(params);
+        const msg = {"messages": [
+          {
+            "imageUrl": IMurl,
+            "platform": "slack",
+            "type": 3
+          }
+        ]};
+        res.send(msg);
+      }).catch(err => {
+       console.log("ERR", err.response.data.error);
+      })
       break;
     default:
       console.log('default passed');
