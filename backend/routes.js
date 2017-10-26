@@ -121,7 +121,7 @@ router.post('/fulfillment', (req, res, next) => {
               {
                 name: 'quiz-followup',
                 lifespan: 2,
-                parameters: { term },
+                parameters: { termEN: term.termEN },
               }
             ]
           });
@@ -129,7 +129,7 @@ router.post('/fulfillment', (req, res, next) => {
       });
       break;
     case 'quiz.q1':
-      let q1res = result.contexts.parameters.answer === result.contexts.parameters.term ? "✔️" : `Ⅹ - ${result.contexts.parameters.term}`
+      let q1res = result.contexts.parameters.answer === result.contexts.parameters.termEN ? "✔️" : `Ⅹ - ${result.contexts.parameters.termEN}`
       res.json({speech: q1res, displayText: q1res});
       // Term.count().exec((err, count) => {
       //   var random = Math.floor(Math.random() * count);
