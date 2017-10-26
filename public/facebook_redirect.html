@@ -1,0 +1,82 @@
+<!-- DONT USE, DEPRECATED - JT -->
+<!DOCTYPE html>
+<html>
+<head>
+<title>Facebook Login</title>
+<meta charset="UTF-8">
+</head>
+<body>
+  <h1>Facebook Login</h1>
+<script>
+
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '362280927530951',
+      cookie     : true,  // enable cookies to allow the server to access the session
+      xfbml      : true,  // parse social plugins on this page
+      version    : 'v2.8' // use graph api version 2.8
+    });
+
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  };
+
+  function statusChangeCallback(response) {
+    console.log('statusChangeCallback', response);
+    if (response.status === 'connected') {
+      // console.log('accessToken', response.authResponse.accessToken);
+      // fetch({
+      //   method: 'post',
+      //   body: {
+      //     accessToken: response.authResponse.accessToken,
+      //   }
+      // })
+      testAPI();
+    } else {
+      document.getElementById('status').innerHTML = 'Please log ' +
+        'into this app.';
+    }
+  }
+
+  function testAPI() {
+    FB.api('/me', function(response) {
+      console.log('Successful login' + JSON.stringify(response)); // response is an object {name: 'Jeff Tang', id: '123...' }
+      document.getElementById('status').innerHTML =
+      'Thanks for logging in, ' + response.name + '!';
+    });
+  }
+
+  function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  }
+
+  // Load the SDK asynchronously
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+</script>
+
+<!--
+  Below we include the Login Button social plugin. This button uses
+  the JavaScript SDK to present a graphical Login button that triggers
+  the FB.login() function when clicked.
+-->
+
+<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+</fb:login-button>
+
+<div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div>
+
+<div id="status">
+</div>
+
+</body>
+</html>

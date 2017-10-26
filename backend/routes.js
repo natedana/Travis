@@ -3,6 +3,7 @@ const router = express.Router();
 const axios = require('axios');
 const delaySeconds = require('./delay').delaySeconds;
 const fs = require('fs');
+const path = require('path');
 
 const Term = require('./models').Term;
 
@@ -114,14 +115,6 @@ router.post('/fulfillment', (req, res, next) => {
   }
 })
 
-// var q = 'q='+result.parameters.term;
-// var safe = 'safe=medium';
-// var searchType = 'searchType=image';
-// var num = 'num=1';
-// var key = `key=${process.env.GOOGLE_SERVER_KEY}`;
-// var cx = `cx=${process.env.SEARCH_ID}`;
-// var params = [q, safe, searchType, num, key, cx];
-
 router.post('/delete', (req, res) => {
   Term.remove({termEN: req.body.text}).exec((err, b) => {
     res.json({success: true, text: `Successfully deleted the term ${req.body.text}.`})
@@ -152,9 +145,39 @@ router.post('/list', (req, res) => {
   })
 });
 
+
+// router.get('/facebook_redirect', (req, res) => {
+//   const FB_APP_ID = '362280927530951';
+//   const REDIRECT_FB_URL = 'http://localhost:3000/facebook_redirect';
+//   const fbUrl = `https://www.facebook.com/v2.10/dialog/oauth?client_id=${FB_APP_ID}&redirect_uri=${REDIRECT_FB_URL}`;
+//   let fbGraphUrl = 'https://graph.facebook.com/v2.10/oauth/access_token?';
+//   const fbObj = {
+//     client_id: FB_APP_ID,
+//     redirect_uri: REDIRECT_FB_URL,
+//     client_secret: process.env.FB_CLIENT_SECRET,
+//     code: req.query.code,
+//   }
+//   for (var key in fbObj) {
+//     fbGraphUrl += fbObj[key] + '&'
+//   }
+//   axios.get(fbGraphUrl)
+//     .then((resp) => {
+//       console.log(resp);
+//       res.send('Authenticated with Facebook!');
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//       res.send('Error authenticating login');
+//     })
+// })
+// router.get('/facebook_redirect', (req, res) => {
+//   fs.readFile(path.join('./public/facebook_redirect.html'), 'utf8', (err, data) => {
+//     res.send(data);
+//   });
+// })
+
 router.get('/privacy_policy', (req, res) => {
-  fs.readFile('./privacy_policy.html', 'utf8', (err, data) => {
-    console.log(data);
+  fs.readFile(path.join('./public/privacy_policy.html'), 'utf8', (err, data) => {
     res.send(data);
   });
 })
