@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const TermSchema = new mongoose.Schema({
   termEN: {
     type: String,
+    unique: true,
   },
   termCN: {
     type: String,

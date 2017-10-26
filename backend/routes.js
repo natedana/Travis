@@ -34,7 +34,7 @@ router.post('/fulfillment', (req, res, next) => {
         res.json({ speech: displayText, displayText });
         break;
       case 'request-list':
-       Term.find().limit(10).exec((err, results) => {
+       Term.find().limit(10).sort({ timeStamp: -1 }).exec((err, results) => {
          if (!results) {
            displayText = 'No list pal';
            res.json({ speech: displayText, displayText });
