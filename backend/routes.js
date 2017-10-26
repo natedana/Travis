@@ -27,6 +27,7 @@ router.get('/', (req, res) => {
 router.post('/fulfillment', (req, res, next) => {
   const result = req.body.result;
   let displayText;
+  let q1, q2, q3;
 
   switch (result.action) {
     case 'save-term.confirm':
@@ -107,6 +108,45 @@ router.post('/fulfillment', (req, res, next) => {
       }).catch(err => {
        console.log("ERR", err.response.data.error);
       })
+      break;
+    case 'quiz':
+      Term.count().exec((err, count) => {
+        var random = Math.floor(Math.random() * count);
+        Term.findOne().skip(random).exec((err, result) => {
+          displayText = `What is ${result.termEN} in Chinese?`;
+          q1 = result
+          res.json({speech: displayText, displayText});
+        });
+      });
+      break;
+    case 'quizQ1':
+      let q1res = q1.termCN === result.resolvedQuery.trim() ? "Correct" : `X - ${q1.termCN}`
+      Term.count().exec((err, count) => {
+        var random = Math.floor(Math.random() * count);
+        Term.findOne().skip(random).exec(function(err, result) {
+          displayText = `What is the chinese of ${result.termEN}`;
+          q2 = result
+          displayText = q1res + '\n' + displayText
+          res.json({speech: displayText, displayText});
+        });
+      });
+      break;
+    case 'quizQ2':
+      let q2res = (q2.termCN === result.resolvedQuery.trim())?"Correct":`X - ${q2.termCN}`
+      Term.count().exec(function(err, count) {
+        var random = Math.floor(Math.random() * count);
+        Term.findOne().skip(random).exec(function(err, result) {
+          displayText = `What is the chinese of ${result.termEN}`;
+          q3 = result
+          displayText = q2res + '\n' + displayText
+          res.json({speech: displayText, displayText});
+        });
+      });
+      break;
+    case 'quizQ3':
+      let q3res = (q3.termCN === result.resolvedQuery.trim())?"Correct":`X - ${q3.termCN}`
+      displayText = q3res
+      res.json({speech: displayText, displayText});
       break;
     default:
       console.log('default passed');
