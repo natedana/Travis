@@ -17,7 +17,7 @@ router.post('/fulfillment', (req, res, next) => {
   let displayText;
 
   switch (result.action) {
-    case 'save-term-followup.confirm':
+    case 'save-term.confirm':
       Term.create({ termEN: result.parameters.term })
         .then(resp => {
           console.log('\nterm created', resp);
@@ -29,7 +29,7 @@ router.post('/fulfillment', (req, res, next) => {
           displayText = `Uh oh, something went wrong.`;
           res.json({ speech: displayText, displayText });
         });
-      case 'save-term-followup.reject':
+      case 'save-term.reject':
         displayText = 'Term not saved'
         res.json({ speech: displayText, displayText });
       break;
