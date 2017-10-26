@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
 
 router.post('/fulfillment', (req, res, next) => {
   const speech = 'Abhi Fitness Dot I.O.'
-  const result = req.body.result; /
+  const result = req.body.result; //
   let displayText;
 
   switch (result.action) {
