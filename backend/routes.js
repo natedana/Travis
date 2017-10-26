@@ -83,10 +83,11 @@ router.post('/fulfillment', (req, res, next) => {
       var cx = `cx=${process.env.SEARCH_ID}`;
       var params = [q, safe, searchType, num, key, cx];
       var url = 'https://www.googleapis.com/customsearch/v1?' + params.join('&');
-      console.log('\ndebug:', params);
-      axios.get(url).then((res) => {
-        const IMtitle = res.data.items[0].title;
-        const IMurl = res.data.items[0].image.thumbnailLink;
+      console.log('\ndebug:', result);
+      axios.get(url).then((resp) => {
+        const IMtitle = resp.data.items[0].title;
+        const IMurl = resp.data.items[0].image.thumbnailLink;
+        console.log('imurl', IMurl);
         const msg = {"messages": [
           {
             "imageUrl": IMurl,
