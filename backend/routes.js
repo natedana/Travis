@@ -61,7 +61,7 @@ router.post('/fulfillment', (req, res, next) => {
       });
       break;
     case 'translate':
-      axios.post('https://translation.googleapis.com/language/translate/v2?key=' + process.env.GOOGLE_SEVER_KEY, {
+      axios.post('https://translation.googleapis.com/language/translate/v2?key=' + process.env.GOOGLE_SERVER_KEY, {
         q: result.parameters.term,
         target: 'zh-CN',
         source: 'en',
