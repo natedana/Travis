@@ -130,8 +130,8 @@ router.post('/fulfillment', (req, res, next) => {
       break;
     case 'quiz.q1':
       console.log(result)
-      const answer = result.contexts.parameters.answer;
-      const termEN = result.contexts.parameters.term;
+      const answer = result.contexts[0].parameters.answer;
+      const termEN = result.contexts[0].parameters.term;
       let q1res = answer === termEN ? "✔️" : `Ⅹ - ${termEN}`;
       console.log('q1res', q1res, answer, termEN);
       // res.json({speech: q1res, displayText: q1res});
