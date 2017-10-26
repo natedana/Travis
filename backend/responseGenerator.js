@@ -1,11 +1,11 @@
-const newRes = function(text,data = {},contextOut = [],source = '',followup = {}) {
+const newRes = (displayText, data = {}, contextOut = [], source = '') => {
   return {
-    text:text,
-    speech: text,
-    data: data,
-    contextOut: contextOut,
-    source: source,
-    followupEvent: followup
-  }
-}
-module.exports = newRes
+    speech: displayText,
+    displayText,
+    data,
+    contextOut,
+    source,
+  };
+};
+
+module.exports = newRes;

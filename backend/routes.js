@@ -7,6 +7,8 @@ const fs = require('fs');
 const Term = require('./models').Term;
 const key = process.env.GOOGLE_SERVER_KEY;
 
+const newRes = require('./responseGenerator');
+
 router.get('/', (req, res) => {
   res.send('hello world');
 });
@@ -34,6 +36,28 @@ router.post('/fulfillment', (req, res, next) => {
         displayText = 'Term not saved'
         res.json({ speech: displayText, displayText });
         break;
+      case 'request-list':
+       Term.find().limit(10).exec((err, results) => {
+         if (!results) {
+           res.json(newRes('No List Pal'))
+         } else {
+           let text = 'Your terms:'
+           results.forEach(term => {
+             text += `\n   -${term.termEN} / ${term.termCN}`
+           })
+           res.json(newRes(text))
+         }
+       }).catch(err => {
+         res.json(newRes("Error:" + err))
+       });
+       break;
+    //  case 'delete-term.confirm':
+    //    Term.remove({termEN: result.parameters.term}).exec((err, b) => {
+    //      res.json(newRes('Term '+result.parameters.term+' deleted.'))
+    //    }).catch(err => {
+    //      res.json(newRes('Term doesn\'t exist.'+err))
+    //    });
+    //    break;
     default:
       console.log('default passed');
       res.send('default passed');
