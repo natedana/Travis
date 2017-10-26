@@ -29,13 +29,15 @@ router.post('/fulfillment', (req, res, next) => {
           displayText = `Uh oh, something went wrong.`;
           res.json({ speech: displayText, displayText });
         });
+        break;
       case 'save-term.reject':
         displayText = 'Term not saved'
         res.json({ speech: displayText, displayText });
-      break;
+        break;
     default:
       console.log('default passed');
       res.send('default passed');
+      break;
   }
 })
 
