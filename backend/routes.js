@@ -46,7 +46,7 @@ router.post('/fulfillment', (req, res, next) => {
              text += `${term.termEN} `
            })
            console.log(text);
-           res.json(newRes(text))
+           res.json({ speech: text, displayText: text });
          }
        }).catch(err => {
          res.json(newRes("Error:" + err))
