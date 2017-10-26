@@ -119,7 +119,7 @@ router.post('/fulfillment', (req, res, next) => {
         });
       });
       break;
-    case 'quizQ1':
+    case 'quiz.q1':
       let q1res = q1.termCN === result.resolvedQuery.trim() ? "Correct" : `X - ${q1.termCN}`
       Term.count().exec((err, count) => {
         var random = Math.floor(Math.random() * count);
@@ -131,23 +131,23 @@ router.post('/fulfillment', (req, res, next) => {
         });
       });
       break;
-    case 'quizQ2':
-      let q2res = (q2.termCN === result.resolvedQuery.trim())?"Correct":`X - ${q2.termCN}`
-      Term.count().exec(function(err, count) {
-        var random = Math.floor(Math.random() * count);
-        Term.findOne().skip(random).exec(function(err, result) {
-          displayText = `What is the chinese of ${result.termEN}`;
-          q3 = result
-          displayText = q2res + '\n' + displayText
-          res.json({speech: displayText, displayText});
-        });
-      });
-      break;
-    case 'quizQ3':
-      let q3res = (q3.termCN === result.resolvedQuery.trim())?"Correct":`X - ${q3.termCN}`
-      displayText = q3res
-      res.json({speech: displayText, displayText});
-      break;
+    // case 'quizQ2':
+    //   let q2res = (q2.termCN === result.resolvedQuery.trim())?"Correct":`X - ${q2.termCN}`
+    //   Term.count().exec(function(err, count) {
+    //     var random = Math.floor(Math.random() * count);
+    //     Term.findOne().skip(random).exec(function(err, result) {
+    //       displayText = `What is the chinese of ${result.termEN}`;
+    //       q3 = result
+    //       displayText = q2res + '\n' + displayText
+    //       res.json({speech: displayText, displayText});
+    //     });
+    //   });
+    //   break;
+    // case 'quizQ3':
+    //   let q3res = (q3.termCN === result.resolvedQuery.trim())?"Correct":`X - ${q3.termCN}`
+    //   displayText = q3res
+    //   res.json({speech: displayText, displayText});
+    //   break;
     default:
       console.log('default passed');
       res.send('default passed');
