@@ -129,11 +129,12 @@ router.post('/fulfillment', (req, res, next) => {
       });
       break;
     case 'quiz.q1':
-      const answer = result.contexts.parameters.answer;
-      const termEN = result.contexts.parameters.termEN;
-      console.log('\nq1res', q1res, answer, termEN);
-      let q1res = answer === termEN ? "✔️" : `Ⅹ - ${termEN}`;
-      res.json({speech: q1res, displayText: q1res});
+      console.log(result)
+      // const answer = result.contexts.parameters.answer;
+      // const termEN = result.contexts.parameters.termEN;
+      // console.log('\nq1res', q1res, answer, termEN);
+      // let q1res = answer === termEN ? "✔️" : `Ⅹ - ${termEN}`;
+      // res.json({speech: q1res, displayText: q1res});
       // Term.count().exec((err, count) => {
       //   var random = Math.floor(Math.random() * count);
       //   Term.findOne().skip(random).exec(function(err, result) {
