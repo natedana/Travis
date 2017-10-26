@@ -16,12 +16,18 @@ router.post('/slack/fulfillment', (req, res, next) => {
   const result = req.body.result;
   switch (result.action) {
     case 'save-term-followup.confirm':
+    let displayText;
       Term.create({ termEN: result.parameters.term })
         .then(resp => {
-          console.log("term created", resp);
-          res.send('term created');
+          console.log('\nterm created', resp);
+          displayText = `Your term ${result.parameters.term} saved 🔥`;
+          res.json({ speech: displayText, displayText });
         })
-        .catch(err => console.log('Error: term not created', err));
+        .catch(err => {
+          console.log('\nError: term not created', err);
+          displayText = `Uh oh, something went wrong.`;
+          res.json({ speech: displayText, displayText });
+        });
       break;
     default:
       console.log('default passed');
