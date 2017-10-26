@@ -130,6 +130,7 @@ router.post('/fulfillment', (req, res, next) => {
       break;
     case 'quiz.q1':
       let q1res = result.contexts.parameters.answer === result.contexts.parameters.termEN ? "✔️" : `Ⅹ - ${result.contexts.parameters.termEN}`
+      console.log('\nq1res', q1res, result.contexts.parameters.answer, result.contexts.parameters.termEN);
       res.json({speech: q1res, displayText: q1res});
       // Term.count().exec((err, count) => {
       //   var random = Math.floor(Math.random() * count);
