@@ -121,7 +121,7 @@ router.post('/fulfillment', (req, res, next) => {
               {
                 name: 'quiz-followup',
                 lifespan: 2,
-                parameters: { termEN: term.termEN },
+                parameters: { term: term.termEN },
               }
             ]
           });
@@ -130,8 +130,8 @@ router.post('/fulfillment', (req, res, next) => {
       break;
     case 'quiz.q1':
       console.log(result)
-      // const answer = result.contexts.parameters.answer;
-      // const termEN = result.contexts.parameters.termEN;
+      const answer = result.contexts.parameters.answer;
+      const termEN = result.contexts.parameters.term;
       // console.log('\nq1res', q1res, answer, termEN);
       // let q1res = answer === termEN ? "✔️" : `Ⅹ - ${termEN}`;
       // res.json({speech: q1res, displayText: q1res});
