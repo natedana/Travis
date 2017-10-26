@@ -14,9 +14,10 @@ router.get('/', (req, res) => {
 router.post('/fulfillment', (req, res, next) => {
   console.log('\n/fulfillment', req.body);
   const result = req.body.result;
+  let displayText;
+
   switch (result.action) {
     case 'save-term-followup.confirm':
-    let displayText;
       Term.create({ termEN: result.parameters.term })
         .then(resp => {
           console.log('\nterm created', resp);
@@ -28,6 +29,9 @@ router.post('/fulfillment', (req, res, next) => {
           displayText = `Uh oh, something went wrong.`;
           res.json({ speech: displayText, displayText });
         });
+      case 'save-term-followup.reject':
+        displayText = 'Term not saved'
+        res.json({ speech: displayText, displayText });
       break;
     default:
       console.log('default passed');
