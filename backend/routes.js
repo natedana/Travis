@@ -33,7 +33,7 @@ router.post('/fulfillment', (req, res, next) => {
       displayText = 'Term not saved'
       res.json({ speech: displayText, displayText });
       break;
-    case 'request-list':
+    case 'list':
       Term.find().limit(10).sort({ timeStamp: -1 }).exec((err, results) => {
         if (!results) {
           displayText = 'No list pal';
