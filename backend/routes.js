@@ -43,9 +43,9 @@ router.post('/fulfillment', (req, res, next) => {
          } else {
            let text = 'Your terms:'
            results.forEach(term => {
-             text += `\n-${term.termEN}`
+             text += `${term.termEN} `
            })
-           console.log('\nYour terms', text);
+           console.log(text);
            res.json(newRes(text))
          }
        }).catch(err => {
