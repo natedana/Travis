@@ -43,22 +43,23 @@ router.post('/fulfillment', (req, res, next) => {
          } else {
            let text = 'Your terms:'
            results.forEach(term => {
-             text += `${term.termEN} `
+             text += `\n-${term.termEN}`
            })
            console.log(text);
-           res.json({ speech: text, displayText: text });
+          //  res.json({ speech: text, displayText: text }); // original
+
+          // default messages
+           res.send({"messages": [
+             {
+               "speech": "Text response",
+               "type": 0
+             }
+           ]});
          }
        }).catch(err => {
          res.json(newRes("Error:" + err))
        });
        break;
-    //  case 'delete-term.confirm':
-    //    Term.remove({termEN: result.parameters.term}).exec((err, b) => {
-    //      res.json(newRes('Term '+result.parameters.term+' deleted.'))
-    //    }).catch(err => {
-    //      res.json(newRes('Term doesn\'t exist.'+err))
-    //    });
-    //    break;
     default:
       console.log('default passed');
       res.send('default passed');

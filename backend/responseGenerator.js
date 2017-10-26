@@ -1,3 +1,7 @@
+// const defaultData = {
+//   data:
+// };
+
 const newRes = (displayText, data = {}, contextOut = [], source = '') => {
   return {
     speech: displayText,
