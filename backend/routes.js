@@ -5,55 +5,102 @@ const delaySeconds = require('./delay').delaySeconds;
 const fs = require('fs');
 
 const Term = require('./models').Term;
-const key = process.env.GOOGLE_SERVER_KEY;
+
+const newRes = require('./responseGenerator');
+
+// when we do `res.json({ speech, displayText })`, we are using "Fulfillment Response" (https://dialogflow.com/docs/fulfillment#response)
+
+// however, we can also send very simple DialogFlow "default messages" using the formats at this URL:   https://dialogflow.com/docs/reference/agent/message-objects#one-click_integration_message_objects
+//  res.send({"messages": [
+//    {
+//      "speech": "Text response",
+//      "type": 0
+//    }
+//  ]});
+
 
 router.get('/', (req, res) => {
   res.send('hello world');
 });
 
-router.post('/slack/fulfillment', (req, res, next) => {
-  console.log('/slack/fulfillment', req.body);
+router.post('/fulfillment', (req, res, next) => {
   const result = req.body.result;
+  let displayText;
+
   switch (result.action) {
-    case 'save-term-followup.confirm':
+    case 'save-term.confirm':
       Term.create({ termEN: result.parameters.term })
-        .then(resp => {
-          console.log("term created", resp);
-          res.send('term created');
-        })
-        .catch(err => console.log('Error: term not created', err));
+      .then(resp => {
+        displayText = `${result.parameters.term} saved to your profile 🔥`;
+        res.json({ speech: displayText, displayText });
+      })
+      .catch(err => {
+        displayText = `You already saved that term!`;
+        res.json({ speech: displayText, displayText });
+      });
+      break;
+    case 'save-term.reject':
+      displayText = 'Term not saved'
+      res.json({ speech: displayText, displayText });
+      break;
+    case 'list':
+      Term.find().limit(10).sort({ timeStamp: -1 }).exec((err, results) => {
+        if (!results) {
+          displayText = 'No list pal';
+          res.json({ speech: displayText, displayText });
+        } else {
+          displayText = 'Your terms:';
+          results.forEach((term, idx) => {
+            displayText += `\n ${idx + 1}) ${term.termEN}`;
+          });
+          res.json({ speech: displayText, displayText });
+        }
+      }).catch(err => {
+        displayText = `Error: ${err}`;
+        res.json({ speech: displayText, displayText });
+      });
+      break;
+    case 'translate':
+      axios.post('https://translation.googleapis.com/language/translate/v2?key=' + process.env.GOOGLE_SERVER_KEY, {
+        q: result.parameters.term,
+        target: 'zh-CN',
+        source: 'en',
+        format: 'text'
+      }).then((resp) => {
+        displayText = `${result.parameters.term} ~ ${resp.data.data.translations[0].translatedText}`;
+        res.json({ speech: displayText, displayText });
+      }).catch(err => {
+        displayText = 'Error: ' + err;
+        res.json({ speech: displayText, displayText });
+      });
+      break;
+    case 'picture':
+      var q = 'q='+result.parameters.term;
+      var safe = 'safe=medium';
+      var searchType = 'searchType=image';
+      var num = 'num=1';
+      var key = `key=${process.env.GOOGLE_SERVER_KEY}`;
+      var cx = `cx=${process.env.SEARCH_ID}`;
+      var params = [q, safe, searchType, num, key, cx];
+      var url = 'https://www.googleapis.com/customsearch/v1?' + params.join('&');
+      axios.get(url).then((resp) => {
+        const IMurl = resp.data.items[0].image.thumbnailLink;
+        const msg = {"messages": [
+          {
+            "imageUrl": IMurl,
+            "platform": "slack",
+            "type": 3
+          }
+        ]};
+        res.send(msg);
+      }).catch(err => {
+       console.log("ERR", err.response.data.error);
+      })
       break;
     default:
       console.log('default passed');
       res.send('default passed');
-  }
-})
-
-router.post('/interactive', (req, res, next) => {
-  console.log("PAYLOAD\n\n\n",req.body.payload);
-  const parsed = JSON.parse(req.body.payload); //tests vs. real might have diff data structure
-  console.log('parsed payload', parsed);
-  switch (parsed.callback_id) {
-    case('CONFIRM_NEW_TERM'): // we need to check if name of button is save or reject TODO
-      console.log('confirm new term selected:');
-      delaySeconds(5000,() => {
-        console.log('5 second delay');
-      })
-      if (parsed.actions[0].value[0] === '1') {
-        Term.create({termEN: parsed.actions[0].value.split('_')[1].slice(3), termCN: parsed.actions[0].value.split('_')[2].slice(3)})
-          .then(resp => {
-            console.log("word response",resp);
-            res.json({success: true, text: `Your term ${resp.termEN} -> ${resp.termCN} saved!🔥`})
-          })
-          .catch(err => res.json({success: false, text: 'Your term did not save 😔'}));
-      } else {
-        res.json({success: true, text: 'That\'s ok maybe next time.'})
-      }
       break;
-    default:
-      console.log('default passed \n \n Parsed payload');
-      console.log(parsed);
-      res.json({success: false, text: 'Hmm, something went wrong with your interactive'});
   }
 })
 
