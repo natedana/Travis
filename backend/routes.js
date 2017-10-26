@@ -85,7 +85,7 @@ router.post('/fulfillment', (req, res, next) => {
       }
       let url = 'https://www.googleapis.com/customsearch/v1?';
       for (var key in queryObj) {
-        url += obj[key] + '&';
+        url += queryObj[key] + '&';
       }
       console.log('url', url);
       axios.get(url).then((resp) => {
