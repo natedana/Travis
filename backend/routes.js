@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
 
 router.post('/fulfillment', (req, res, next) => {
   const speech = 'Abhi Fitness Dot I.O.'
-  const result = req.body.result; //
+  const result = req.body.result;
   let displayText;
 
   switch (result.action) {
@@ -23,29 +23,29 @@ router.post('/fulfillment', (req, res, next) => {
       Term.create({ termEN: result.parameters.term })
       .then(resp => {
         displayText = `${result.parameters.term} saved to your profile 🔥`;
-        res.json({ displayText });
+        res.json({ speech, displayText });
       })
       .catch(err => {
         displayText = `You already saved that term!`;
-        res.json({ displayText });
+        res.json({ speech, displayText });
       });
       break;
     case 'save-term.reject':
       displayText = 'Term not saved'
-      res.json({ displayText });
+      res.json({ speech, displayText });
       break;
     case 'list':
       Term.find().limit(10).sort({ timeStamp: -1 }).exec((err, results) => {
         if (!results) {
           displayText = 'No list pal';
-          res.json({ displayText });
+          res.json({ speech, displayText });
         } else {
           displayText = 'Your terms:';
           results.forEach(term => {
             displayText += `\n - ${term.termEN}`;
           });
           //  using DialogFlow "Fulfillment Response" (https://dialogflow.com/docs/fulfillment#response)
-          res.json({ displayText });
+          res.json({ speech, displayText });
           // using DialogFlow "default messages" (https://dialogflow.com/docs/reference/agent/message-objects#one-click_integration_message_objects)
           //  res.send({"messages": [
           //    {
@@ -56,7 +56,7 @@ router.post('/fulfillment', (req, res, next) => {
         }
       }).catch(err => {
         displayText = `Error: ${err}`;
-        res.json({ displayText });
+        res.json({ speech, displayText });
       });
       break;
     case 'translate':
@@ -67,10 +67,10 @@ router.post('/fulfillment', (req, res, next) => {
         format: 'text'
       }).then((resp) => {
         displayText = `${result.parameters.term} translated: ${resp.data.data.translations[0].translatedText}`;
-        res.json({ displayText });
+        res.json({ speech, displayText });
       }).catch(err => {
         displayText = 'Error: ' + err;
-        res.json({ displayText });
+        res.json({ speech, displayText });
       });
       break;
     default:
