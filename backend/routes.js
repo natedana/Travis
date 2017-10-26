@@ -75,20 +75,30 @@ router.post('/fulfillment', (req, res, next) => {
       });
       break;
     case 'picture':
-      var q = 'q='+result.parameters.term;
-      var safe = 'safe=medium';
-      var searchType = 'searchType=image';
-      var num = 'num=1';
-      var key = `key=${process.env.GOOGLE_SERVER_KEY}`;
-      var cx = `cx=${process.env.SEARCH_ID}`;
-      var params = [q, safe, searchType, num, key, cx];
-      var url = 'https://www.googleapis.com/customsearch/v1?' + params.join('&');
+      const queryObj = {
+        q: 'q='+result.parameters.term,
+        safe: 'safe=medium',
+        searchType: 'searchType=image',
+        num: 'num=1',
+        key: `key=${process.env.GOOGLE_SERVER_KEY}`,
+        cx: `cx=${process.env.SEARCH_ID}`,
+      }
+      let url = 'https://www.googleapis.com/customsearch/v1?';
+      for (var key in queryObj) {
+        url += obj[key] + '&';
+      }
+      console.log('url', url);
       axios.get(url).then((resp) => {
         const IMurl = resp.data.items[0].image.thumbnailLink;
         const msg = {"messages": [
           {
             "imageUrl": IMurl,
             "platform": "slack",
+            "type": 3
+          },
+          {
+            "imageUrl": IMurl,
+            "platform": "facebook",
             "type": 3
           }
         ]};
@@ -103,6 +113,14 @@ router.post('/fulfillment', (req, res, next) => {
       break;
   }
 })
+
+// var q = 'q='+result.parameters.term;
+// var safe = 'safe=medium';
+// var searchType = 'searchType=image';
+// var num = 'num=1';
+// var key = `key=${process.env.GOOGLE_SERVER_KEY}`;
+// var cx = `cx=${process.env.SEARCH_ID}`;
+// var params = [q, safe, searchType, num, key, cx];
 
 router.post('/delete', (req, res) => {
   Term.remove({termEN: req.body.text}).exec((err, b) => {
