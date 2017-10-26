@@ -11,8 +11,8 @@ router.get('/', (req, res) => {
   res.send('hello world');
 });
 
-router.post('/slack/fulfillment', (req, res, next) => {
-  console.log('/slack/fulfillment', req.body);
+router.post('/fulfillment', (req, res, next) => {
+  console.log('\n/fulfillment', req.body);
   const result = req.body.result;
   switch (result.action) {
     case 'save-term-followup.confirm':
@@ -20,7 +20,7 @@ router.post('/slack/fulfillment', (req, res, next) => {
       Term.create({ termEN: result.parameters.term })
         .then(resp => {
           console.log('\nterm created', resp);
-          displayText = `Your term ${result.parameters.term} saved 🔥`;
+          displayText = `${result.parameters.term} saved to your profile 🔥`;
           res.json({ speech: displayText, displayText });
         })
         .catch(err => {
