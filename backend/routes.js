@@ -112,24 +112,34 @@ router.post('/fulfillment', (req, res, next) => {
     case 'quiz':
       Term.count().exec((err, count) => {
         var random = Math.floor(Math.random() * count);
-        Term.findOne().skip(random).exec((err, result) => {
-          displayText = `What is ${result.termEN} in Chinese?`;
-          q1 = result
-          res.json({speech: displayText, displayText});
+        Term.findOne().skip(random).exec((err, term) => {
+          displayText = `What is ${term.termEN} in Chinese?`;
+          res.json({
+            speech: displayText,
+            displayText,
+            contextOut: [
+              {
+                name: quiz-followup,
+                lifespan: 2,
+                parameters: { term },
+              }
+            ]
+          });
         });
       });
       break;
     case 'quiz.q1':
-      let q1res = q1.termCN === result.resolvedQuery.trim() ? "Correct" : `X - ${q1.termCN}`
-      Term.count().exec((err, count) => {
-        var random = Math.floor(Math.random() * count);
-        Term.findOne().skip(random).exec(function(err, result) {
-          displayText = `What is the chinese of ${result.termEN}`;
-          q2 = result
-          displayText = q1res + '\n' + displayText
-          res.json({speech: displayText, displayText});
-        });
-      });
+      let q1res = result.contexts.parameters.answer === result.contexts.parameters.term ? "✔️" : `Ⅹ - ${result.contexts.parameters.term}`
+      res.json({speech: q1res, displayText: q1res});
+      // Term.count().exec((err, count) => {
+      //   var random = Math.floor(Math.random() * count);
+      //   Term.findOne().skip(random).exec(function(err, result) {
+      //     displayText = `What is the chinese of ${result.termEN}`;
+      //     q2 = result
+      //     displayText = q1res + '\n' + displayText
+      //     res.json({speech: displayText, displayText});
+      //   });
+      // });
       break;
     // case 'quizQ2':
     //   let q2res = (q2.termCN === result.resolvedQuery.trim())?"Correct":`X - ${q2.termCN}`
