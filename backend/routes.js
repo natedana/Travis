@@ -64,10 +64,10 @@ router.post('/fulfillment', (req, res, next) => {
         target: 'zh-CN',
         source: 'en',
         format: 'text'
-      }).then((res) => {
+      }).then((resp) => {
         const text = {
-          displayText: ' - ' + res.data.data.translations[0].translatedText,
-          speech: ' - ' + res.data.data.translations[0].translatedText
+          displayText: ' - ' + resp.data.data.translations[0].translatedText,
+          speech: ' - ' + resp.data.data.translations[0].translatedText
         };
         res.json(text);
       }).catch(err => {
