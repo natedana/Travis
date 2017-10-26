@@ -119,7 +119,7 @@ router.post('/fulfillment', (req, res, next) => {
             displayText,
             contextOut: [
               {
-                name: quiz-followup,
+                name: 'quiz-followup',
                 lifespan: 2,
                 parameters: { term },
               }
