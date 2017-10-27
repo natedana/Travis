@@ -134,7 +134,6 @@ router.post('/fulfillment', (req, res, next) => {
       const termEN = result.contexts[0].parameters.term;
       let q1res = answer === termEN ? "✔️" : `Ⅹ - ${termEN}`;
       console.log('q1res', q1res, answer, termEN);
-      res.json({speech: q1res, displayText: q1res});
       Term.count().exec((err, count) => {
         var random = Math.floor(Math.random() * count);
         Term.findOne().skip(random).exec(function(err, term) {
