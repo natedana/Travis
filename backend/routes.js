@@ -101,11 +101,6 @@ router.post('/fulfillment', (req, res) => {
           },
           {
             "imageUrl": imgUrl,
-            "platform": "twilio",
-            "type": 3
-          },
-          {
-            "imageUrl": imgUrl,
             "platform": "facebook",
             "type": 3
           }
@@ -117,23 +112,23 @@ router.post('/fulfillment', (req, res) => {
       });
       break;
     }
-		case 'exam': {
-      const newExam = new Exam({
-        length: parseInt(result.parameters.length) || 2,
-        score: 0,
-      });
+		case 'exam-start': {
+      const newExam = new Exam();
       Term.find().exec((err, Terms) => {
-        newExam.questions = _.shuffle(Terms).slice(0,parseInt(result.parameters.length)).map(termObj => ({prompt:termObj.termEN, answer:termObj.termCN}));
+        newExam.questions =
+          _.shuffle(Terms)
+          .slice(0, newExam.examLength)
+          .map(termObj => ({ prompt:termObj.termEN, answer:termObj.termCN }));
         newExam.save(err => {
           if (!err) {
-            displayText = `Question 1: Translate ${newExam.questions[0].prompt} to Chinese.`
+            displayText = `Q1: Translate ${newExam.questions[0].prompt} to Chinese.`
             res.json({speech: displayText, displayText,
               contextOut: [
                 {
-                  name: 'quiz-followup',
-                  lifespan: 2,
+                  name: 'exam-followup',
+                  lifespan: 1,
                   parameters: {
-                    examData: JSON.stringify(newExam),
+                    examData: newExam,
                   }
                 }
               ]
@@ -144,100 +139,32 @@ router.post('/fulfillment', (req, res) => {
       break;
     }
     case 'exam-followup':
-      if (result.parameters.answer === 'end') {
-        displayText = 'Exam cancelled';
+      const examData = {...result.contexts[0].parameters.examData};
+      const id = examData._id;
+      const currentQuestion = examData.questions[examData.currentIndex];
+      if (currentQuestion.answer === currentQuestion.prompt) {
+        examData.score += 1;
+      }
+      if (examData.currentIndex + 1 === examData.examLength) {
+        displayText = `Finished! You got ${examData.score} out of ${examData.examLength}`;
         res.json({speech: displayText, displayText});
-      }
-      else {
-        console.log(result.parameters);
-        const examData = JSON.parse(result.parameters.examData)
-        const id = examData._id;
-        Exam.findById(id).exec((err, foundExam => {
-          if (foundExam.length === examData.length) {
-            displayText = `Finished! You got ${number_correct} out of ${foundExam.length}`;
-            res.json({speech: displayText, displayText});
-          } else {
-						displayText = `Question ${foundExam.currentIndex + 1}: Translate ${foundExam.questions[0].prompt} to Chinese.`;
-						foundExam.save(() => {
-							res.json({speech: displayText, displayText,
-								contextOut: [
-									{
-										name: 'quiz-followup',
-										lifespan: 2,
-										parameters: {
-											examData: JSON.stringify(newExam),
-										}
-									}
-								]});
-						});
-            res.json({speech: displayText, displayText: displayText});
-          }
-        }))
-      }
-    case 'quiz':
-      Term.count().exec((err, count) => {
-        var random = Math.floor(Math.random() * count);
-        Term.findOne().skip(random).exec((err, term) => {
-          if (err) {
-            displayText = 'Error creating quiz: ' + err;
-            res.json({ speech: displayText, displayText });
-          }
-          displayText = `What is ${term.termEN} in Chinese?`;
-          res.json({
-            speech: displayText,
-            displayText,
-            //TODO contextOut
-            contextOut: [
-              {
-                name: 'quiz-followup',
-                lifespan: 2,
-                parameters: { term: term.termEN },
-              }
-            ]
-          });
+      } else {
+        examData.currentIndex += 1;
+				displayText = `Q${examData.currentIndex + 1}: Translate ${examData.questions[examData.currentIndex].prompt} to Chinese.`;
+				res.json({speech: displayText, displayText,
+					contextOut: [
+						{
+							name: 'exam-followup',
+							lifespan: 2,
+							parameters: {
+								examData: examData,
+							}
+						}
+					]
         });
-      });
-      break;
-    case 'quiz.q1'://TODO lexical declaration
-      console.log(result)
-      const answer = result.contexts[0].parameters.answer;
-      const termEN = result.contexts[0].parameters.term;
-      let q1res = answer === termEN ? "✔️" : `Ⅹ - ${termEN}`;
-      console.log('q1res', q1res, answer, termEN);
-      Term.count().exec((err, count) => {
-        var random = Math.floor(Math.random() * count);
-        Term.findOne().skip(random).exec(function(err, term) {
-          displayText = [q1res,`What is ${result.termEN} in Chinese?`].join(' ')
-          res.json({speech: displayText, displayText,
-            contextOut: [
-            {
-              name: 'quiz-followup',
-              lifespan: 2,
-              parameters: { term: term.termEN },
-            }
-          ]});
-        });
-      });
-      break;
-    // case 'quizQ2':
-    //   let q2res = (q2.termCN === result.resolvedQuery.trim())?"Correct":`X - ${q2.termCN}`
-    //   Term.count().exec(function(err, count) {
-    //     var random = Math.floor(Math.random() * count);
-    //     Term.findOne().skip(random).exec(function(err, result) {
-    //       displayText = `What is the chinese of ${result.termEN}`;
-    //       q3 = result
-    //       displayText = q2res + '\n' + displayText
-    //       res.json({speech: displayText, displayText});
-    //     });
-    //   });
-    //   break;
-    // case 'quizQ3':
-    //   let q3res = (q3.termCN === result.resolvedQuery.trim())?"Correct":`X - ${q3.termCN}`
-    //   displayText = q3res
-    //   res.json({speech: displayText, displayText});
-    //   break;
+      }
+    break;
     default:
-      console.log('default passed');
       res.send('default passed');
       break;
   }
