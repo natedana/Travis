@@ -7,48 +7,40 @@ const path = require('path');
 
 const Term = require('./models').Term;
 
-const newRes = require('./responseGenerator');
-
-// when we do `res.json({ speech, displayText })`, we are using "Fulfillment Response" (https://dialogflow.com/docs/fulfillment#response)
-
-// however, we can also send very simple DialogFlow "default messages" using the formats at this URL:   https://dialogflow.com/docs/reference/agent/message-objects#one-click_integration_message_objects
-//  res.send({"messages": [
-//    {
-//      "speech": "Text response",
-//      "type": 0
-//    }
-//  ]});
-
+const newRes = require('./responseGenerator');// TODO use?
 
 router.get('/', (req, res) => {
   res.send('hello world');
 });
 
-router.post('/fulfillment', (req, res, next) => {
+router.post('/fulfillment', (req, res) => {
   const result = req.body.result;
   let displayText;
-  let q1, q2, q3;
+  let q1, q2, q3;// TODO can we turn quiz into a repeatable function?
 
   switch (result.action) {
     case 'save-term.confirm':
       Term.create({ termEN: result.parameters.term })
-      .then(resp => {
+      .then(() => {
         displayText = `${result.parameters.term} saved to your profile 🔥`;
         res.json({ speech: displayText, displayText });
       })
-      .catch(err => {
-        displayText = `You already saved that term!`;
+      .catch(() => {
+        displayText = 'You already saved that term!';
         res.json({ speech: displayText, displayText });
       });
       break;
     case 'save-term.reject':
-      displayText = 'Term not saved'
+      displayText = 'Term not saved';
       res.json({ speech: displayText, displayText });
       break;
     case 'list':
       Term.find().limit(10).sort({ timeStamp: -1 }).exec((err, results) => {
-        if (!results) {
+        if (err) {
           displayText = 'No list pal';
+          res.json({ speech: displayText, displayText });
+        } else if (results.length === 0) {
+          displayText = 'No terms yet - save them with "save"';
           res.json({ speech: displayText, displayText });
         } else {
           displayText = 'Your terms:';
@@ -58,7 +50,7 @@ router.post('/fulfillment', (req, res, next) => {
           res.json({ speech: displayText, displayText });
         }
       }).catch(err => {
-        displayText = `Error: ${err}`;
+        displayText = `Error finding your terms: ${err}`;
         res.json({ speech: displayText, displayText });
       });
       break;
@@ -72,11 +64,11 @@ router.post('/fulfillment', (req, res, next) => {
         displayText = `${result.parameters.term} ~ ${resp.data.data.translations[0].translatedText}`;
         res.json({ speech: displayText, displayText });
       }).catch(err => {
-        displayText = 'Error: ' + err;
+        displayText = 'Error translating term: ' + err;
         res.json({ speech: displayText, displayText });
       });
       break;
-    case 'picture':
+    case 'picture': {
       const queryObj = {
         q: 'q='+result.parameters.term,
         safe: 'safe=medium',
@@ -84,39 +76,48 @@ router.post('/fulfillment', (req, res, next) => {
         num: 'num=1',
         key: `key=${process.env.GOOGLE_SERVER_KEY}`,
         cx: `cx=${process.env.SEARCH_ID}`,
-      }
-      let url = 'https://www.googleapis.com/customsearch/v1?';
+      };
+      let queryUrl = 'https://www.googleapis.com/customsearch/v1?';
       for (var key in queryObj) {
-        url += queryObj[key] + '&';
+        if (queryObj.hasOwnProperty(key)) {
+          queryUrl += queryObj[key] + '&';
+        }
       }
-      console.log('url', url);
-      axios.get(url).then((resp) => {
-        const IMurl = resp.data.items[0].image.thumbnailLink;
+      axios.get(queryUrl).then((resp) => {
+        const imgUrl = resp.data.items[0].image.thumbnailLink;
+        //TODO
         const msg = {"messages": [
           {
-            "imageUrl": IMurl,
+            "imageUrl": imgUrl,
             "platform": "slack",
             "type": 3
           },
           {
-            "imageUrl": IMurl,
+            "imageUrl": imgUrl,
             "platform": "facebook",
             "type": 3
           }
         ]};
         res.send(msg);
       }).catch(err => {
-       console.log("ERR", err.response.data.error);
-      })
+          displayText = 'Error finding picture: ' + err;
+          res.json({ speech: displayText, displayText });
+      });
       break;
+    }
     case 'quiz':
       Term.count().exec((err, count) => {
         var random = Math.floor(Math.random() * count);
         Term.findOne().skip(random).exec((err, term) => {
+          if (err) {
+            displayText = 'Error creating quiz: ' + err;
+            res.json({ speech: displayText, displayText });
+          }
           displayText = `What is ${term.termEN} in Chinese?`;
           res.json({
             speech: displayText,
             displayText,
+            //TODO contextOut
             contextOut: [
               {
                 name: 'quiz-followup',
@@ -128,7 +129,7 @@ router.post('/fulfillment', (req, res, next) => {
         });
       });
       break;
-    case 'quiz.q1':
+    case 'quiz.q1'://TODO lexical declaration
       console.log(result)
       const answer = result.contexts[0].parameters.answer;
       const termEN = result.contexts[0].parameters.term;
@@ -171,7 +172,7 @@ router.post('/fulfillment', (req, res, next) => {
       res.send('default passed');
       break;
   }
-})
+});
 
 router.post('/delete', (req, res) => {
   Term.remove({termEN: req.body.text}).exec((err, b) => {
@@ -184,24 +185,24 @@ router.post('/delete', (req, res) => {
   })
 })
 
-router.post('/list', (req, res) => {
-  Term.find({}, (err, results) => {
-    if (!results) {
-      res.json({success: false, text: "Empty list yoyoyo!"})
-    } else {
-      let text = 'Your terms:'
-      results.forEach(term => {
-        text += `\n   -${term.termEN} / ${term.termCN}`
-      })
-      res.json({success: true, text})
-    }
-  }).catch(err => {
-    res.json({
-      success: false,
-      text: `Something went wrong:` + err
-    })
-  })
-});
+/* router.post('/list', (req, res) => { */
+/*   Term.find({}, (err, results) => { */
+/*     if (!results) { */
+/*       res.json({success: false, text: "Empty list yoyoyo!"}) */
+/*     } else { */
+/*       let text = 'Your terms:' */
+/*       results.forEach(term => { */
+/*         text += `\n   -${term.termEN} / ${term.termCN}` */
+/*       }) */
+/*       res.json({success: true, text}) */
+/*     } */
+/*   }).catch(err => { */
+/*     res.json({ */
+/*       success: false, */
+/*       text: `Something went wrong:` + err */
+/*     }) */
+/*   }) */
+/* }); */
 
 
 // router.get('/facebook_redirect', (req, res) => {
@@ -236,8 +237,11 @@ router.post('/list', (req, res) => {
 
 router.get('/privacy_policy', (req, res) => {
   fs.readFile(path.join('./public/privacy_policy.html'), 'utf8', (err, data) => {
-    res.send(data);
+    if (err) console.log('Error reading file', err);
+    else {
+      res.send(data);
+    }
   });
-})
+});
 
 module.exports = router;
