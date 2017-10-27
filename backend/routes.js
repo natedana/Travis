@@ -142,8 +142,8 @@ router.post('/fulfillment', (req, res) => {
     }
     case 'exam-followup':
       const examData = {...result.contexts[0].parameters.examData};
-      console.log('\ncurrent', result.parameters.answer, examData.questions, examData.currentIndex, examData.questions[examData.currentIndex].answer);
-      if (examData.questions[examData.currentIndex].answer === result.parameters.answer) {
+      console.log('\ncurrent', result.parameters.answer, examData.currentIndex, examData.questions[examData.currentIndex].answer);
+      if (examData.questions[examData.currentIndex].answer.toLowerCase() === result.parameters.answer.toLowerCase()) {
         examData.score += 1;
       }
       if (examData.currentIndex + 1 === examData.examLength) {
