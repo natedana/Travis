@@ -113,7 +113,9 @@ router.post('/fulfillment', (req, res) => {
       break;
     }
 		case 'exam-start': {
-      const newExam = new Exam();
+      const newExam = new Exam({
+        examLength: result.parameters.number || 3,
+      });
       Term.find().exec((err, Terms) => {
         newExam.questions =
           _.shuffle(Terms)
