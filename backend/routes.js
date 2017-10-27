@@ -110,6 +110,25 @@ router.post('/fulfillment', (req, res) => {
       });
       break;
     }
+    case 'exam-followup':
+      if (result.parameters.answer === 'end') {
+        displayText = 'Exam cancelled';
+        res.json({speech: displayText, displayText});
+      }
+      else {
+        exam.find().exec((err, foundExam => {
+          if (foundExam.length === result.parameters.examData.length) {
+            // compute score
+            displayText = `Finished! You got ${number_correct} out of ${foundExam.length}`;
+            res.json({speech: displayText, displayText});
+          } else {
+            // find new random term
+            // make sure term is not in examData
+            displayText = msg
+            res.json({speech: score, displayText: score})
+          }
+        }))
+      }
     case 'quiz':
       Term.count().exec((err, count) => {
         var random = Math.floor(Math.random() * count);
