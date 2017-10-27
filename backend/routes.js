@@ -140,9 +140,7 @@ router.post('/fulfillment', (req, res) => {
     }
     case 'exam-followup':
       const examData = {...result.contexts[0].parameters.examData};
-      const id = examData._id;
-      const currentQuestion = examData.questions[examData.currentIndex];
-      if (currentQuestion.answer === currentQuestion.prompt) {
+      if (examData.questions[examData.currentIndex].answer === result.parameters.answer) {
         examData.score += 1;
       }
       if (examData.currentIndex + 1 === examData.examLength) {
