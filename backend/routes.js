@@ -1,13 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const _ = require('underscore');
 const delaySeconds = require('./delay').delaySeconds;
 const fs = require('fs');
 const path = require('path');
 
 const Term = require('./models').Term;
+const Exam = require('./models').Exam;
 
-const newRes = require('./responseGenerator');// TODO use?
+/* const newRes = require('./responseGenerator');// TODO use? */
 
 router.get('/', (req, res) => {
   res.send('hello world');
@@ -110,22 +112,60 @@ router.post('/fulfillment', (req, res) => {
       });
       break;
     }
+		case 'exam': {
+      const newExam = new Exam({
+        length: parseInt(result.parameters.length) || 2,
+        score: 0,
+      });
+      Term.find().exec((err, Terms) => {
+        newExam.questions = _.shuffle(Terms).slice(0,parseInt(result.parameters.length)).map(termObj => ({prompt:termObj.termEN, answer:termObj.termCN}));
+        newExam.save(err => {
+          if (!err) {
+            displayText = `Question 1: Translate ${newExam.questions[0].prompt} to Chinese.`
+            res.json({speech: displayText, displayText,
+              contextOut: [
+                {
+                  name: 'quiz-followup',
+                  lifespan: 2,
+                  parameters: {
+                    examData: JSON.stringify(newExam),
+                  }
+                }
+              ]
+            });
+          }
+        });
+      });
+      break;
+    }
     case 'exam-followup':
       if (result.parameters.answer === 'end') {
         displayText = 'Exam cancelled';
         res.json({speech: displayText, displayText});
       }
       else {
-        exam.find().exec((err, foundExam => {
-          if (foundExam.length === result.parameters.examData.length) {
-            // compute score
+        console.log(result.parameters);
+        const examData = JSON.parse(result.parameters.examData)
+        const id = examData._id;
+        Exam.findById(id).exec((err, foundExam => {
+          if (foundExam.length === examData.length) {
             displayText = `Finished! You got ${number_correct} out of ${foundExam.length}`;
             res.json({speech: displayText, displayText});
           } else {
-            // find new random term
-            // make sure term is not in examData
-            displayText = msg
-            res.json({speech: score, displayText: score})
+						displayText = `Question ${foundExam.currentIndex + 1}: Translate ${foundExam.questions[0].prompt} to Chinese.`;
+						foundExam.save(() => {
+							res.json({speech: displayText, displayText,
+								contextOut: [
+									{
+										name: 'quiz-followup',
+										lifespan: 2,
+										parameters: {
+											examData: JSON.stringify(newExam),
+										}
+									}
+								]});
+						});
+            res.json({speech: displayText, displayText: displayText});
           }
         }))
       }
