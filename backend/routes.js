@@ -138,8 +138,7 @@ router.post('/fulfillment', (req, res, next) => {
       Term.count().exec((err, count) => {
         var random = Math.floor(Math.random() * count);
         Term.findOne().skip(random).exec(function(err, term) {
-          displayText = [q1res,displayText].join(' ')
-          displayText = `What is ${result.termEN} in Chinese?`;
+          displayText = [q1res,`What is ${result.termEN} in Chinese?`;].join(' ')
           res.json({speech: displayText, displayText,
             contextOut: [
             {
