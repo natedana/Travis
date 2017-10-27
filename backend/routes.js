@@ -94,6 +94,11 @@ router.post('/fulfillment', (req, res) => {
           },
           {
             "imageUrl": imgUrl,
+            "platform": "line",
+            "type": 3
+          },
+          {
+            "imageUrl": imgUrl,
             "platform": "facebook",
             "type": 3
           }
