@@ -99,6 +99,11 @@ router.post('/fulfillment', (req, res) => {
           },
           {
             "imageUrl": imgUrl,
+            "platform": "twilio",
+            "type": 3
+          },
+          {
+            "imageUrl": imgUrl,
             "platform": "facebook",
             "type": 3
           }
