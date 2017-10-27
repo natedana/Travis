@@ -22,7 +22,7 @@ router.post('/fulfillment', (req, res) => {
 
   switch (result.action) {
     case 'save-term.confirm':
-      Term.create({ termEN: result.parameters.term })
+      Term.create({ termEN: result.parameters.term , termCN: result.parameters.term })
       .then(() => {
         displayText = `${result.parameters.term} saved to your profile 🔥`;
         res.json({ speech: displayText, displayText });
@@ -142,6 +142,7 @@ router.post('/fulfillment', (req, res) => {
     }
     case 'exam-followup':
       const examData = {...result.contexts[0].parameters.examData};
+      console.log('\ncurrent', result.parameters.answer, examData.questions, examData.currentIndex, examData.questions[examData.currentIndex].answer);
       if (examData.questions[examData.currentIndex].answer === result.parameters.answer) {
         examData.score += 1;
       }
