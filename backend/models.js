@@ -25,6 +25,9 @@ const ExamSchema = new mongoose.Schema({
   score: {
     type: Number,
   },
+  currentIndex: {
+    type: Number
+  }
 });
 
 const Term = mongoose.model('Term', TermSchema);
