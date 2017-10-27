@@ -15,25 +15,27 @@ const TermSchema = new mongoose.Schema({
 });
 
 const ExamSchema = new mongoose.Schema({
-  length: {
-    type: Number,
+  questions: {
+    type: Array,// questions: [{prompt, answer}]
   },
-  questions: [{
-    prompt : String,
-    answer : String
-     }],
+  examLength: {
+    type: Number,
+    default: 3,
+  },
   score: {
     type: Number,
+    default: 0,
   },
   currentIndex: {
-    type: Number
+    type: Number,
+    default: 0,
   }
 });
 
 const Term = mongoose.model('Term', TermSchema);
-const User = mongoose.model('User', UserSchema);
+const Exam = mongoose.model('Exam', ExamSchema);
 
 module.exports = {
   Term,
-  User,
+  Exam,
 };

@@ -1,13 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const _ = require('underscore');
 const delaySeconds = require('./delay').delaySeconds;
 const fs = require('fs');
 const path = require('path');
 
 const Term = require('./models').Term;
+const Exam = require('./models').Exam;
 
-const newRes = require('./responseGenerator');// TODO use?
+/* const newRes = require('./responseGenerator');// TODO use? */
 
 router.get('/', (req, res) => {
   res.send('hello world');
@@ -110,70 +112,59 @@ router.post('/fulfillment', (req, res) => {
       });
       break;
     }
-    case 'quiz':
-      Term.count().exec((err, count) => {
-        var random = Math.floor(Math.random() * count);
-        Term.findOne().skip(random).exec((err, term) => {
-          if (err) {
-            displayText = 'Error creating quiz: ' + err;
-            res.json({ speech: displayText, displayText });
+		case 'exam-start': {
+      const newExam = new Exam({
+        examLength: result.parameters.number || 3,
+      });
+      Term.find().exec((err, Terms) => {
+        newExam.questions =
+          _.shuffle(Terms)
+          .slice(0, newExam.examLength)
+          .map(termObj => ({ prompt:termObj.termEN, answer:termObj.termCN }));
+        newExam.save(err => {
+          if (!err) {
+            displayText = `Q1: Translate ${newExam.questions[0].prompt} to Chinese.`
+            res.json({speech: displayText, displayText,
+              contextOut: [
+                {
+                  name: 'exam-followup',
+                  lifespan: 1,
+                  parameters: {
+                    examData: newExam,
+                  }
+                }
+              ]
+            });
           }
-          displayText = `What is ${term.termEN} in Chinese?`;
-          res.json({
-            speech: displayText,
-            displayText,
-            //TODO contextOut
-            contextOut: [
-              {
-                name: 'quiz-followup',
-                lifespan: 2,
-                parameters: { term: term.termEN },
-              }
-            ]
-          });
         });
       });
       break;
-    case 'quiz.q1'://TODO lexical declaration
-      console.log(result)
-      const answer = result.contexts[0].parameters.answer;
-      const termEN = result.contexts[0].parameters.term;
-      let q1res = answer === termEN ? "✔️" : `Ⅹ - ${termEN}`;
-      console.log('q1res', q1res, answer, termEN);
-      Term.count().exec((err, count) => {
-        var random = Math.floor(Math.random() * count);
-        Term.findOne().skip(random).exec(function(err, term) {
-          displayText = [q1res,`What is ${result.termEN} in Chinese?`].join(' ')
-          res.json({speech: displayText, displayText,
-            contextOut: [
-            {
-              name: 'quiz-followup',
-              lifespan: 2,
-              parameters: { term: term.termEN },
-            }
-          ]});
+    }
+    case 'exam-followup':
+      const examData = {...result.contexts[0].parameters.examData};
+      if (examData.questions[examData.currentIndex].answer === result.parameters.answer) {
+        examData.score += 1;
+      }
+      if (examData.currentIndex + 1 === examData.examLength) {
+        displayText = `Finished! You got ${examData.score} out of ${examData.examLength}`;
+        res.json({speech: displayText, displayText});
+      } else {
+        examData.currentIndex += 1;
+				displayText = `Q${examData.currentIndex + 1}: Translate ${examData.questions[examData.currentIndex].prompt} to Chinese.`;
+				res.json({speech: displayText, displayText,
+					contextOut: [
+						{
+							name: 'exam-followup',
+							lifespan: 2,
+							parameters: {
+								examData: examData,
+							}
+						}
+					]
         });
-      });
-      break;
-    // case 'quizQ2':
-    //   let q2res = (q2.termCN === result.resolvedQuery.trim())?"Correct":`X - ${q2.termCN}`
-    //   Term.count().exec(function(err, count) {
-    //     var random = Math.floor(Math.random() * count);
-    //     Term.findOne().skip(random).exec(function(err, result) {
-    //       displayText = `What is the chinese of ${result.termEN}`;
-    //       q3 = result
-    //       displayText = q2res + '\n' + displayText
-    //       res.json({speech: displayText, displayText});
-    //     });
-    //   });
-    //   break;
-    // case 'quizQ3':
-    //   let q3res = (q3.termCN === result.resolvedQuery.trim())?"Correct":`X - ${q3.termCN}`
-    //   displayText = q3res
-    //   res.json({speech: displayText, displayText});
-    //   break;
+      }
+    break;
     default:
-      console.log('default passed');
       res.send('default passed');
       break;
   }
