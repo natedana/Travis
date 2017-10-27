@@ -31,9 +31,9 @@ const ExamSchema = new mongoose.Schema({
 });
 
 const Term = mongoose.model('Term', TermSchema);
-const User = mongoose.model('User', UserSchema);
+const Exam = mongoose.model('Exam', ExamSchema);
 
 module.exports = {
   Term,
-  User,
+  Exam,
 };
