@@ -3,6 +3,7 @@ const router = express.Router();
 const axios = require('axios');
 const delaySeconds = require('./delay').delaySeconds;
 const fs = require('fs');
+const path = require('path');
 
 const Term = require('./models').Term;
 
@@ -26,6 +27,7 @@ router.get('/', (req, res) => {
 router.post('/fulfillment', (req, res, next) => {
   const result = req.body.result;
   let displayText;
+  let q1, q2, q3;
 
   switch (result.action) {
     case 'save-term.confirm':
@@ -75,20 +77,30 @@ router.post('/fulfillment', (req, res, next) => {
       });
       break;
     case 'picture':
-      var q = 'q='+result.parameters.term;
-      var safe = 'safe=medium';
-      var searchType = 'searchType=image';
-      var num = 'num=1';
-      var key = `key=${process.env.GOOGLE_SERVER_KEY}`;
-      var cx = `cx=${process.env.SEARCH_ID}`;
-      var params = [q, safe, searchType, num, key, cx];
-      var url = 'https://www.googleapis.com/customsearch/v1?' + params.join('&');
+      const queryObj = {
+        q: 'q='+result.parameters.term,
+        safe: 'safe=medium',
+        searchType: 'searchType=image',
+        num: 'num=1',
+        key: `key=${process.env.GOOGLE_SERVER_KEY}`,
+        cx: `cx=${process.env.SEARCH_ID}`,
+      }
+      let url = 'https://www.googleapis.com/customsearch/v1?';
+      for (var key in queryObj) {
+        url += queryObj[key] + '&';
+      }
+      console.log('url', url);
       axios.get(url).then((resp) => {
         const IMurl = resp.data.items[0].image.thumbnailLink;
         const msg = {"messages": [
           {
             "imageUrl": IMurl,
             "platform": "slack",
+            "type": 3
+          },
+          {
+            "imageUrl": IMurl,
+            "platform": "facebook",
             "type": 3
           }
         ]};
@@ -97,6 +109,63 @@ router.post('/fulfillment', (req, res, next) => {
        console.log("ERR", err.response.data.error);
       })
       break;
+    case 'quiz':
+      Term.count().exec((err, count) => {
+        var random = Math.floor(Math.random() * count);
+        Term.findOne().skip(random).exec((err, term) => {
+          displayText = `What is ${term.termEN} in Chinese?`;
+          res.json({
+            speech: displayText,
+            displayText,
+            contextOut: [
+              {
+                name: 'quiz-followup',
+                lifespan: 2,
+                parameters: { term: term.termEN },
+              }
+            ]
+          });
+        });
+      });
+      break;
+    case 'quiz.q1':
+      console.log(result)
+      const answer = result.contexts[0].parameters.answer;
+      const termEN = result.contexts[0].parameters.term;
+      let q1res = answer === termEN ? "✔️" : `Ⅹ - ${termEN}`;
+      console.log('q1res', q1res, answer, termEN);
+      Term.count().exec((err, count) => {
+        var random = Math.floor(Math.random() * count);
+        Term.findOne().skip(random).exec(function(err, term) {
+          displayText = [q1res,`What is ${result.termEN} in Chinese?`].join(' ')
+          res.json({speech: displayText, displayText,
+            contextOut: [
+            {
+              name: 'quiz-followup',
+              lifespan: 2,
+              parameters: { term: term.termEN },
+            }
+          ]});
+        });
+      });
+      break;
+    // case 'quizQ2':
+    //   let q2res = (q2.termCN === result.resolvedQuery.trim())?"Correct":`X - ${q2.termCN}`
+    //   Term.count().exec(function(err, count) {
+    //     var random = Math.floor(Math.random() * count);
+    //     Term.findOne().skip(random).exec(function(err, result) {
+    //       displayText = `What is the chinese of ${result.termEN}`;
+    //       q3 = result
+    //       displayText = q2res + '\n' + displayText
+    //       res.json({speech: displayText, displayText});
+    //     });
+    //   });
+    //   break;
+    // case 'quizQ3':
+    //   let q3res = (q3.termCN === result.resolvedQuery.trim())?"Correct":`X - ${q3.termCN}`
+    //   displayText = q3res
+    //   res.json({speech: displayText, displayText});
+    //   break;
     default:
       console.log('default passed');
       res.send('default passed');
@@ -134,9 +203,39 @@ router.post('/list', (req, res) => {
   })
 });
 
+
+// router.get('/facebook_redirect', (req, res) => {
+//   const FB_APP_ID = '362280927530951';
+//   const REDIRECT_FB_URL = 'http://localhost:3000/facebook_redirect';
+//   const fbUrl = `https://www.facebook.com/v2.10/dialog/oauth?client_id=${FB_APP_ID}&redirect_uri=${REDIRECT_FB_URL}`;
+//   let fbGraphUrl = 'https://graph.facebook.com/v2.10/oauth/access_token?';
+//   const fbObj = {
+//     client_id: FB_APP_ID,
+//     redirect_uri: REDIRECT_FB_URL,
+//     client_secret: process.env.FB_CLIENT_SECRET,
+//     code: req.query.code,
+//   }
+//   for (var key in fbObj) {
+//     fbGraphUrl += fbObj[key] + '&'
+//   }
+//   axios.get(fbGraphUrl)
+//     .then((resp) => {
+//       console.log(resp);
+//       res.send('Authenticated with Facebook!');
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//       res.send('Error authenticating login');
+//     })
+// })
+// router.get('/facebook_redirect', (req, res) => {
+//   fs.readFile(path.join('./public/facebook_redirect.html'), 'utf8', (err, data) => {
+//     res.send(data);
+//   });
+// })
+
 router.get('/privacy_policy', (req, res) => {
-  fs.readFile('./privacy_policy.html', 'utf8', (err, data) => {
-    console.log(data);
+  fs.readFile(path.join('./public/privacy_policy.html'), 'utf8', (err, data) => {
     res.send(data);
   });
 })
