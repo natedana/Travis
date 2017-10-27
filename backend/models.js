@@ -11,19 +11,23 @@ const TermSchema = new mongoose.Schema({
   timeStamp: {
     type: Date,
     default: new Date(),
-  },
-  // owner: {
-  //   type: Schema.Types.ObjectId,
-  //   ref: 'User' }
+  }
 });
 
-const UserSchema = new mongoose.Schema({
-  username: {
-    type: String,
+const ExamSchema = new mongoose.Schema({
+  length: {
+    type: Number,
   },
-  password: {
-    type: String,
+  questions: [{
+    prompt : String,
+    answer : String
+     }],
+  score: {
+    type: Number,
   },
+  currentIndex: {
+    type: Number
+  }
 });
 
 const Term = mongoose.model('Term', TermSchema);
