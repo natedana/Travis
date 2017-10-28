@@ -112,7 +112,7 @@ router.post('/fulfillment', (req, res) => {
     }
 		case 'exam-start': {
       const newExam = new Exam({
-        examLength: result.parameters.number || 3,
+        examLength: result.parameters.number || 1,
       });
       Term.find().exec((err, Terms) => {
         newExam.questions =
