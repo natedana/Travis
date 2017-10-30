@@ -2,12 +2,12 @@
   "name": "translator",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "backend/index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node backend/index.js",
     "test": "mocha --timeout 5000 --exit",
     "slack": "node ./backend/slack.js",
-    "server": "nodemon index.js"
+    "server": "nodemon backend/index.js"
   },
   "repository": {
     "type": "git",

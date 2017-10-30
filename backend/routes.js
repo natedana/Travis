@@ -4,7 +4,6 @@ const axios = require('axios');
 const _ = require('underscore');
 const fs = require('fs');
 const path = require('path');
-// const delaySeconds = require('./delay').delaySeconds;
 
 const Term = require('./models').Term;
 const Exam = require('./models').Exam;
@@ -185,64 +184,5 @@ router.get('/privacy_policy', (req, res) => {
   });
 });
 
-// router.post('/delete', (req, res) => {
-//   Term.remove({termEN: req.body.text}).exec((err, b) => {
-//     res.json({success: true, text: `Successfully deleted the term ${req.body.text}.`})
-//   }).catch(err => {
-//     res.json({
-//       success: false,
-//       text: `Something went wrong:` + err
-//     })
-//   })
-// })
-
-/* router.post('/list', (req, res) => { */
-/*   Term.find({}, (err, results) => { */
-/*     if (!results) { */
-/*       res.json({success: false, text: "Empty list yoyoyo!"}) */
-/*     } else { */
-/*       let text = 'Your terms:' */
-/*       results.forEach(term => { */
-/*         text += `\n   -${term.termEN} / ${term.termCN}` */
-/*       }) */
-/*       res.json({success: true, text}) */
-/*     } */
-/*   }).catch(err => { */
-/*     res.json({ */
-/*       success: false, */
-/*       text: `Something went wrong:` + err */
-/*     }) */
-/*   }) */
-/* }); */
-
-// router.get('/facebook_redirect', (req, res) => {
-//   const FB_APP_ID = '362280927530951';
-//   const REDIRECT_FB_URL = 'http://localhost:3000/facebook_redirect';
-//   const fbUrl = `https://www.facebook.com/v2.10/dialog/oauth?client_id=${FB_APP_ID}&redirect_uri=${REDIRECT_FB_URL}`;
-//   let fbGraphUrl = 'https://graph.facebook.com/v2.10/oauth/access_token?';
-//   const fbObj = {
-//     client_id: FB_APP_ID,
-//     redirect_uri: REDIRECT_FB_URL,
-//     client_secret: process.env.FB_CLIENT_SECRET,
-//     code: req.query.code,
-//   }
-//   for (var key in fbObj) {
-//     fbGraphUrl += fbObj[key] + '&'
-//   }
-//   axios.get(fbGraphUrl)
-//     .then((resp) => {
-//       console.log(resp);
-//       res.send('Authenticated with Facebook!');
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//       res.send('Error authenticating login');
-//     })
-// })
-// router.get('/facebook_redirect', (req, res) => {
-//   fs.readFile(path.join('./public/facebook_redirect.html'), 'utf8', (err, data) => {
-//     res.send(data);
-//   });
-// })
 
 module.exports = router;
