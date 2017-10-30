@@ -1,24 +1,24 @@
 {
-  "name": "translator",
+  "name": "Travis",
   "version": "1.0.0",
   "description": "",
   "main": "backend/index.js",
   "scripts": {
     "start": "node backend/index.js",
     "test": "mocha --timeout 5000 --exit",
-    "slack": "node ./backend/slack.js",
+    "slack": "node backend/slack.js",
     "server": "nodemon backend/index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tangsauce/Translator.git"
+    "url": "git+https://github.com/tangsauce/Travis.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/tangsauce/Translator/issues"
+    "url": "https://github.com/tangsauce/Travis/issues"
   },
-  "homepage": "https://github.com/tangsauce/Translator#readme",
+  "homepage": "https://github.com/tangsauce/Travis#readme",
   "dependencies": {
     "@slack/client": "^3.14.1",
     "apiai": "^4.0.3",

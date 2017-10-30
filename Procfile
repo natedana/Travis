@@ -1,1 +1,1 @@
-node index.js
+node backend/index.js
