@@ -84,7 +84,6 @@ router.post('/fulfillment', (req, res) => {
       }
       axios.get(queryUrl).then((resp) => {
         const imgUrl = resp.data.items[0].image.thumbnailLink;
-        //TODO
         const msg = {"messages": [
           {
             "imageUrl": imgUrl,
@@ -110,20 +109,20 @@ router.post('/fulfillment', (req, res) => {
       break;
     }
 		case 'exam-start': {
-      const newExam = new Exam({
-        examLength: result.parameters.number || 1,
-      });
-      Term.find().exec((err, Terms) => {
+      Term.find().exec((err, foundTerms) => {
+        const newExam = new Exam({
+          examLength: result.parameters.number || foundTerms.length || 1,
+        });
         newExam.questions =
-          _.shuffle(Terms)
+          _.shuffle(foundTerms)
            .slice(0, newExam.examLength)
            .map(termObj => ({
-             prompt:termObj.termEN,
-             answer:termObj.termCN
+             prompt: termObj.termEN,
+             answer: termObj.termCN
            }));
         newExam.save(err => {
           if (!err) {
-            displayText = `Q1) Translate ${newExam.questions[0].prompt} to Chinese (1/${newExam.examLength})`
+            displayText = `Q1) Translate ${newExam.questions[0].prompt} to Chinese (1/${newExam.examLength})`;
             res.json({
               speech: displayText,
               displayText,
