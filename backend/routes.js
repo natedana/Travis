@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 
 router.post('/fulfillment', (req, res) => {
   const result = req.body.result;
-  console.log('\n\nDialogFlow result:\n', result);
+  console.log('\n\nDialogFlow req.body:\n', req.body);
   let displayText;
 
   switch (result.action) {
@@ -28,6 +28,20 @@ router.post('/fulfillment', (req, res) => {
         displayText = 'You already saved that term!';
         res.json({ speech: displayText, displayText });
       });
+
+      /* axios.post('https://api.dialogflow.com/v1/query/?v=20150910', { */
+      /*   event: { name: 'LIST' }, */
+      /*   sessionId: '05d0e955-d2fc-4182-8de8-84ba730485d3' */
+      /* }, { */
+      /*   headers: { 'Authorization': 'Bearer ' + process.env.DF_CLIENT_ACCESS_TOKEN }, */
+      /* }) */
+      /*   .then(resp => { */
+      /*     console.log('\n\nrequest', resp.data); */
+      /*   }) */
+      /*   .catch(err => { */
+      /*     console.log('Error posting /query list:', err.response); */
+      /*   }); */
+
       break;
     case 'save-term.reject':
       displayText = 'Term not saved';
@@ -141,7 +155,7 @@ router.post('/fulfillment', (req, res) => {
       });
       break;
     }
-    case 'exam-followup':
+    case 'exam-followup': {
       const examData = Object.assign({}, result.contexts[0].parameters.examData);
       // console.log('\ncurrent', result.parameters.answer, examData.currentIndex, examData.questions[examData.currentIndex].answer);
       if (examData.questions[examData.currentIndex].answer.toLowerCase() === result.parameters.answer.toLowerCase()) {
@@ -168,6 +182,7 @@ router.post('/fulfillment', (req, res) => {
         });
       }
       break;
+    }
     default:
       res.send('default passed');
       break;
